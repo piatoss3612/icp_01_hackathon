@@ -1,5 +1,40 @@
 export const idlFactory = ({ IDL }) => {
   return IDL.Service({
+    'adoptComment' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
+    'buyArtwork' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+    'buyTicket' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'closeExhibition' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'createExhibition' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Text,
+              'owner' : IDL.Text,
+              'name' : IDL.Text,
+              'description' : IDL.Text,
+              'image' : IDL.Vec(IDL.Nat8),
+              'comments' : IDL.Vec(
+                IDL.Record({
+                  'id' : IDL.Text,
+                  'content' : IDL.Text,
+                  'owner' : IDL.Text,
+                  'adopted' : IDL.Bool,
+                  'exhibition' : IDL.Text,
+                })
+              ),
+              'price' : IDL.Nat,
+              'onSale' : IDL.Bool,
+              'exhibition' : IDL.Text,
+            })
+          ),
+          IDL.Nat,
+          IDL.Vec(IDL.Nat8),
+        ],
+        [IDL.Text],
+        [],
+      ),
     'createUser' : IDL.Func(
         [IDL.Text],
         [
@@ -16,6 +51,86 @@ export const idlFactory = ({ IDL }) => {
         ],
         [],
       ),
+    'getArtwork' : IDL.Func(
+        [IDL.Text],
+        [
+          IDL.Opt(
+            IDL.Record({
+              'id' : IDL.Text,
+              'owner' : IDL.Text,
+              'name' : IDL.Text,
+              'description' : IDL.Text,
+              'image' : IDL.Vec(IDL.Nat8),
+              'comments' : IDL.Vec(
+                IDL.Record({
+                  'id' : IDL.Text,
+                  'content' : IDL.Text,
+                  'owner' : IDL.Text,
+                  'adopted' : IDL.Bool,
+                  'exhibition' : IDL.Text,
+                })
+              ),
+              'price' : IDL.Nat,
+              'onSale' : IDL.Bool,
+              'exhibition' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'getExhibition' : IDL.Func(
+        [IDL.Text],
+        [
+          IDL.Opt(
+            IDL.Record({
+              'id' : IDL.Text,
+              'owner' : IDL.Text,
+              'name' : IDL.Text,
+              'description' : IDL.Text,
+              'artworks' : IDL.Vec(
+                IDL.Record({
+                  'id' : IDL.Text,
+                  'owner' : IDL.Text,
+                  'name' : IDL.Text,
+                  'description' : IDL.Text,
+                  'image' : IDL.Vec(IDL.Nat8),
+                  'comments' : IDL.Vec(
+                    IDL.Record({
+                      'id' : IDL.Text,
+                      'content' : IDL.Text,
+                      'owner' : IDL.Text,
+                      'adopted' : IDL.Bool,
+                      'exhibition' : IDL.Text,
+                    })
+                  ),
+                  'price' : IDL.Nat,
+                  'onSale' : IDL.Bool,
+                  'exhibition' : IDL.Text,
+                })
+              ),
+              'ticketId' : IDL.Text,
+              'onExhibition' : IDL.Bool,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'getExhibitionCost' : IDL.Func([], [IDL.Nat], ['query']),
+    'getTicket' : IDL.Func(
+        [IDL.Text],
+        [
+          IDL.Opt(
+            IDL.Record({
+              'id' : IDL.Text,
+              'image' : IDL.Vec(IDL.Nat8),
+              'price' : IDL.Nat,
+              'exhibition' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'getTokenName' : IDL.Func([], [IDL.Text], ['query']),
     'getUser' : IDL.Func(
         [IDL.Text],
         [
@@ -37,15 +152,17 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Vec(
             IDL.Record({
+              'id' : IDL.Text,
               'owner' : IDL.Text,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'image' : IDL.Vec(IDL.Nat8),
               'comments' : IDL.Vec(
                 IDL.Record({
+                  'id' : IDL.Text,
                   'content' : IDL.Text,
                   'owner' : IDL.Text,
-                  'adapted' : IDL.Bool,
+                  'adopted' : IDL.Bool,
                   'exhibition' : IDL.Text,
                 })
               ),
@@ -62,9 +179,10 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Vec(
             IDL.Record({
+              'id' : IDL.Text,
               'content' : IDL.Text,
               'owner' : IDL.Text,
-              'adapted' : IDL.Bool,
+              'adopted' : IDL.Bool,
               'exhibition' : IDL.Text,
             })
           ),
@@ -82,15 +200,17 @@ export const idlFactory = ({ IDL }) => {
               'description' : IDL.Text,
               'artworks' : IDL.Vec(
                 IDL.Record({
+                  'id' : IDL.Text,
                   'owner' : IDL.Text,
                   'name' : IDL.Text,
                   'description' : IDL.Text,
                   'image' : IDL.Vec(IDL.Nat8),
                   'comments' : IDL.Vec(
                     IDL.Record({
+                      'id' : IDL.Text,
                       'content' : IDL.Text,
                       'owner' : IDL.Text,
-                      'adapted' : IDL.Bool,
+                      'adopted' : IDL.Bool,
                       'exhibition' : IDL.Text,
                     })
                   ),
@@ -99,9 +219,8 @@ export const idlFactory = ({ IDL }) => {
                   'exhibition' : IDL.Text,
                 })
               ),
+              'ticketId' : IDL.Text,
               'onExhibition' : IDL.Bool,
-              'ticketImage' : IDL.Vec(IDL.Nat8),
-              'ticketPrice' : IDL.Nat,
             })
           ),
         ],
@@ -121,6 +240,8 @@ export const idlFactory = ({ IDL }) => {
         ],
         ['query'],
       ),
+    'hasTicket' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
+    'writeComment' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
   });
 };
 export const init = ({ IDL }) => { return []; };
