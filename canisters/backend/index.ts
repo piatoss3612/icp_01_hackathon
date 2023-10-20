@@ -12,7 +12,7 @@ import {
     update,
     Vec
 } from 'azle';
-import { Artwork, Comment, Exhibition, Ticket, User } from './types';
+import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
 
 let userMap = StableBTreeMap(text, User, 0);
@@ -69,11 +69,11 @@ const findComment = (id: text) => {
 }
 
 export default Canister({
-    // 1. 유저 정보 조회 (유저 id) -> Opt<User> 타입 리턴
+    // 유저 정보 조회 (유저 id) -> Opt<User> 타입 리턴
     getUser: query([text], Opt(User), (id) => {
         return userMap.get(id);
     }),
-    // 2. 전시장 정보 조회 (전시장 id) -> Vec<Exhibition> 타입 리턴
+    // 유저 전시장 정보 조회 (유저 id) -> Vec<Exhibition> 타입 리턴
     getUserExhibitions: query([text], Vec(Exhibition), (id) => {
         // 1. 유저 존재하는지 확인
         const user = findUser(id);
@@ -90,7 +90,7 @@ export default Canister({
 
         return exhibitions;
     }),
-    // 3. 작품 정보 조회 (작품 id) -> Vec<Artwork> 타입 리턴 
+    // 유저 소유의 작품 정보 조회 (유저 id) -> Vec<Artwork> 타입 리턴 
     getUserArtworks: query([text], Vec(Artwork), (id) => {
         // 1. 유저 존재하는지 확인
         const user = findUser(id);
@@ -107,7 +107,7 @@ export default Canister({
 
         return artworks;
     }),
-    // 4. 티켓 정보 조회 (티켓 id) -> Vec<Ticket> 타입 리턴
+    // 유저 티켓 정보 조회 (유저 id) -> Vec<Ticket> 타입 리턴
     getUserTickets: query([text], Vec(Ticket), (id) => {
         // 1. 유저 존재하는지 확인
         const user = findUser(id);
@@ -124,7 +124,7 @@ export default Canister({
 
         return tickets;
     }),
-    // 5. 감상평 정보 조회 (감상평 id) -> Vec<Comment> 타입 리턴
+    // 유저 감상평 정보 조회 (유저 id) -> Vec<Comment> 타입 리턴
     getUserComments: query([text], Vec(Comment), (id) => {
         // 1. 유저 존재하는지 확인
         const user = findUser(id);
@@ -141,7 +141,7 @@ export default Canister({
 
         return comments;
     }),
-    // 6. 유저 생성 (이름만 입력) -> bool 타입 리턴
+    // 6. 유저 생성 (이름만 입력) -> Opt<User> 타입 리턴
     createUser: update([text], Opt(User), (name) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
@@ -167,16 +167,42 @@ export default Canister({
 
         return Some(user);
     }),
-    // 7. 전시장 정보 조회 (전시장 id) -> Opt<Exhibition> 타입 리턴
+    // 전시장 정보 조회 (전시장 id) -> Opt<Exhibition> 타입 리턴
     getExhibition: query([text], Opt(Exhibition), (id) => {
         return exhibitionMap.get(id);
     }),
-    // 8. 전시장 생성 비용 조회 -> nat 타입 리턴
+    // 모든 전시장 정보 조회 -> Vec<Exhibition> 타입 리턴
+    getExhibitions: query([], Vec(Exhibition), () => {
+        const exhibitions: typeof Exhibition[] = exhibitionMap.values();
+        return exhibitions;
+    }),
+    // 전시장 생성 비용 조회 -> nat 타입 리턴
     getExhibitionCost: query([], nat, () => {
         return exhibitionCost;
     }),
-    // 9. 전시장 생성 (이름, 설명, 작품들, 티켓 가격, 티켓 이미지) -> text 타입 리턴
-    createExhibition: update([text, text, Vec(Artwork), nat, blob], text, (name, description, artworks, ticketPrice, ticketImage) => {
+    // 작품 정보 조회 (작품 id) -> Opt<Artwork> 타입 리턴
+    getArtwork: query([text], Opt(Artwork), (id) => {
+        return artworkMap.get(id);
+    }),
+    // 전시장 작품 정보 조회 (전시장 id) -> Vec<Artwork> 타입 리턴
+    getArtworks: query([text], Vec(Artwork), (exhibitionId) => {
+        // 1. 전시장 존재하는지 확인
+        const exhibition = findExhibition(exhibitionId);
+
+        // 2. 전시장에 속한 작품들 조회
+        const artworks: typeof Artwork[] = [];
+
+        for (let i = 0; i < exhibition.artworks.length; i++) {
+            const artworkOpt = artworkMap.get(exhibition.artworks[i]);
+            if (!("None" in artworkOpt)) {
+                artworks.push(artworkOpt.Some);
+            }
+        }
+
+        return artworks;
+    }),
+    // 전시장 생성 (이름, 설명, 작품들, 티켓 가격, 티켓 이미지) -> text 타입 리턴
+    createExhibition: update([CreateExhibitionArgs], text, (args) => {
         const caller = getCaller();
 
         // 1. 유저가 존재하는지 확인
@@ -186,40 +212,64 @@ export default Canister({
         const cost = exhibitionCost;
 
         // 3. 파라미터 유효성 검사 (TODO: 작품들이 유효한지 검사)
-        if (name.length > 20 || description.length > 100 || artworks.length <= 0 || artworks.length > 5) {
+        if (args.name.length > 20 || args.description.length > 100 ||
+            args.artworks.length <= 0 || args.artworks.length > 5) {
             throw new Error("Invalid parameters to create exhibition");
         }
 
         // 4. 전시장 생성 비용 지불
         // TODO: call ledger canister
 
-        // 5. 전시장 생성
+        // 5. 전시장 id 및 티켓 id 생성
         const exhibitionId = generateRandomUUID();
         const ticketId = generateRandomUUID();
 
+        // 6. 작품들 생성
+        const artworks: string[] = [];
+
+        for (let i = 0; i < args.artworks.length; i++) {
+            const artworkId = generateRandomUUID();
+
+            const artwork: typeof Artwork = {
+                id: artworkId,
+                name: args.artworks[i].name,
+                description: args.artworks[i].description,
+                owner: caller,
+                price: args.artworks[i].price,
+                onSale: args.artworks[i].onSale,
+                image: args.artworks[i].image,
+                exhibition: exhibitionId,
+                comments: [],
+            }
+
+            artworks.push(artworkId);
+            artworkMap.insert(artworkId, artwork);
+        }
+
+        // 7. 전시장 생성
         const exhibition: typeof Exhibition = {
             id: exhibitionId,
             ticketId: ticketId,
             owner: caller,
-            name,
-            description,
-            artworks,
+            name: args.name,
+            description: args.description,
+            artworks: artworks,
             onExhibition: false,
         }
 
-        // 6. 티켓 생성
+        // 8. 티켓 생성
         const ticket: typeof Ticket = {
             id: ticketId,
             exhibition: exhibition.id,
-            price: ticketPrice,
-            image: ticketImage,
+            price: args.ticketPrice,
+            image: args.ticketImage,
         }
 
-        // 7. 전시장 및 티켓 저장
+        // 9. 전시장 및 티켓 저장
         exhibitionMap.insert(exhibitionId, exhibition);
         ticketMap.insert(ticketId, ticket);
 
-        // 8. 전시장 id 리턴
+        // 10. 전시장 id 리턴
         return exhibitionId;
     }),
     // 전시 마감 (전시장 id) -> bool 타입 리턴
@@ -228,7 +278,7 @@ export default Canister({
         const caller = getCaller();
 
         // 2. 유저가 존재하는지 확인
-        const user = findUser(caller);
+        findUser(caller);
 
         // 3. 전시장 존재하는지 확인
         const exhibition = findExhibition(exhibitionId);
@@ -251,10 +301,11 @@ export default Canister({
 
         return true;
     }),
+    // 티켓 정보 조회 (티켓 id) -> Opt<Ticket> 타입 리턴
     getTicket: query([text], Opt(Ticket), (id) => {
         return ticketMap.get(id);
     }),
-    // 10. 티켓 소지 여부 확인 (전시장 id) -> bool 타입 리턴
+    // 티켓 소지 여부 확인 (전시장 id) -> bool 타입 리턴
     hasTicket: query([text], bool, (exhibitionId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
@@ -274,7 +325,7 @@ export default Canister({
 
         return false;
     }),
-    // 11. 티켓 구매 (전시장 id) -> bool 타입 리턴
+    // 티켓 구매 (전시장 id) -> bool 타입 리턴
     buyTicket: update([text], bool, (exhibitionId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
@@ -308,12 +359,7 @@ export default Canister({
 
         return true;
     }),
-    // 12. 작품 정보 조회 (작품 id) -> Opt<Artwork> 타입 리턴
-    getArtwork: query([text], Opt(Artwork), (id) => {
-        return artworkMap.get(id);
-    }),
-
-    // 13. 작품 구매 (전시장 id, 작품 id) -> bool 타입 리턴
+    // 작품 구매 (전시장 id, 작품 id) -> bool 타입 리턴
     buyArtwork: update([text, text], bool, (exhibitionId, artworkId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
@@ -353,6 +399,23 @@ export default Canister({
 
         return true;
     }),
+    // 작품 감상평 조회 (작품 id) -> Vec<Comment> 타입 리턴
+    getComments: query([text], Vec(Comment), (artworkId) => {
+        // 1. 작품 존재하는지 확인
+        const artwork = findArtwork(artworkId);
+
+        // 2. 작품에 달린 감상평들 조회
+        const comments: typeof Comment[] = [];
+
+        for (let i = 0; i < artwork.comments.length; i++) {
+            const commentOpt = commentMap.get(artwork.comments[i]);
+            if (!("None" in commentOpt)) {
+                comments.push(commentOpt.Some);
+            }
+        }
+
+        return comments;
+    }),
     // 14. 감상평 작성 (전시장 id, 작품 id, 감상평 내용) -> bool 타입 리턴
     writeComment: update([text, text, text], bool, (exhibitionId, artworkId, content) => {
         // 1. 유저 principal 확인
@@ -389,7 +452,7 @@ export default Canister({
         }
 
         // 8. 감상평 저장
-        artwork.comments.push(comment);
+        artwork.comments.push(commentId);
         artworkMap.insert(artworkId, artwork);
         commentMap.insert(commentId, comment);
 
@@ -435,8 +498,6 @@ export default Canister({
         comment.adopted = true;
 
         // 10. 감상평 저장
-        // TODO: artwork 정보 갱신
-        // TODO: user 정보 갱신
         commentMap.insert(commentId, comment);
 
         return true;
