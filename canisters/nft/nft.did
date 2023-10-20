@@ -1,7 +1,8 @@
 service: () -> {
-    createMetaData: (text, text, vec nat8) -> (record {token:nat16; name:text; description:text; attributes:vec text; image:vec nat8});
-    getBalance: (text) -> (nat16) query;
-    getMetaDataList: (text) -> (record {token:nat16; name:text; description:text; attributes:vec text; image:vec nat8}) query;
-    mintNFT: (text, text, nat16) -> (nat16);
-    transfer: (text, text, nat16) -> (text);
+    createMetaData: (text, text, vec nat8) -> (record {name:text; description:text; image:vec nat8});
+    getBalance: (principal) -> (nat16) query;
+    getMetaDataList: (text) -> (opt record {name:text; description:text; image:vec nat8}) query;
+    getMyNFTList: (principal) -> (vec record {id:nat; metaData:record {name:text; description:text; image:vec nat8}; owner:principal; artist:text; price:nat16; onSale:bool}) query;
+    mintNFT: (principal, text, nat16) -> (nat);
+    transfer: (principal, nat) -> (bool);
 }

@@ -5,6 +5,7 @@ import {
     nat,
     None,
     Opt,
+    Principal,
     query,
     Some,
     StableBTreeMap,
@@ -179,8 +180,8 @@ export default Canister({
 
         // 3. 유저 생성
         const user: typeof User = {
-            id: caller,
-            name,
+            id: Principal.fromText(caller),
+            name: name,
             exhibitions: [],
             artWorks: [],
             tickets: [],
@@ -259,7 +260,7 @@ export default Canister({
                 id: artworkId,
                 name: args.artworks[i].name,
                 description: args.artworks[i].description,
-                owner: caller,
+                owner: Principal.fromText(caller),
                 price: args.artworks[i].price,
                 onSale: args.artworks[i].onSale,
                 image: args.artworks[i].image,
@@ -275,7 +276,7 @@ export default Canister({
         const exhibition: typeof Exhibition = {
             id: exhibitionId,
             ticketId: ticketId,
-            owner: caller,
+            owner: Principal.fromText(caller),
             name: args.name,
             description: args.description,
             artworks: artworks,
@@ -314,7 +315,7 @@ export default Canister({
         }
 
         // 5. 전시장 소유자인지 확인
-        if (exhibition.owner !== caller) {
+        if (exhibition.owner !== Principal.fromText(caller)) {
             return false;
         }
 
@@ -502,7 +503,7 @@ export default Canister({
         const exhibition = findExhibition(exhibitionId);
 
         // 4. 전시장의 소유자인지 확인 
-        if (exhibition.owner !== caller) {
+        if (exhibition.owner !== Principal.fromText(caller)) {
             throw new Error("Only owner can adopt comment");
         }
 
