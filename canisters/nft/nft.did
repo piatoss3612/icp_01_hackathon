@@ -1,0 +1,7 @@
+service: () -> {
+    createMetaData: (text, text, vec nat8) -> (record {token:nat16; name:text; description:text; attributes:vec text; image:vec nat8});
+    getBalance: (text) -> (nat16) query;
+    getMetaDataList: (text) -> (record {token:nat16; name:text; description:text; attributes:vec text; image:vec nat8}) query;
+    mintNFT: (text, text, nat16) -> (nat16);
+    transfer: (text, text, nat16) -> (text);
+}
