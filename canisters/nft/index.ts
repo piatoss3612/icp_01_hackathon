@@ -16,8 +16,6 @@ const metaData = Record({
     name: text,
     description: text,
     image: blob,
-    attributes: Vec(text),
-    token: nat16
 });
 
 const metaDataList = Vec(metaData);
