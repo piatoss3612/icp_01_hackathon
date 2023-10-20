@@ -17,6 +17,49 @@ const tokenCanister = ICRC(
     Principal.fromText('mxzaz-hqaaa-aaaar-qaada-cai')
 );
 
+function total_supply(): nat {
+    const total_supply = ic.call(tokenCanister.icrc1_total_supply);
+    return total_supply;
+}
+
+function balance_of(account: Account): nat {
+    const balance = ic.call(tokenCanister.icrc1_balance_of, {
+        args: [account]
+    });
+    return balance;
+}
+
+function transfer(to: Account, value: nat): TransferResult {
+    const result = ic.call(tokenCanister.icrc1_transfer, {
+        args: [{to, value}]
+    });
+    return result;
+}
+
+function approve(spender: Account, value: nat): ApproveResult {
+    const result = ic.call(tokenCanister.icrc2_approve, {
+        args: [{spender, value}]
+    });
+    return result;
+}
+
+function allowance(owner: Account, spender: Account): AllowanceResult {
+    const result = ic.call(tokenCanister.icrc2_allowance, {
+        args: [{owner, spender}]
+    });
+    return result;
+}
+
+function transfer_from(from: Account, to: Account, value: nat): TransferFromResult {
+    const result = ic.call(tokenCanister.icrc2_transfer_from, {
+        args: [{from, to, value}]
+    });
+    return result;
+}
+
+
+export {total_supply, balance_of, transfer, approve, allowance, transfer_from}
+
 // Canister({
 //     icrc1_metadata: query([], Vec(Tuple(text, Value)), async () => {
 //         return await ic.call(tokenCanister.icrc1_metadata);
@@ -81,4 +124,4 @@ const tokenCanister = ICRC(
 //     ),
 // });
 
-export default tokenCanister;
+// export default tokenCanister;
