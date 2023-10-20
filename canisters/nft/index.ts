@@ -107,8 +107,7 @@ export default Canister({
     }),
 
     // 나의 nft 조회
-    getMyNFTList: query([], nftList, () => {
-        const owner = getCaller();
+    getMyNFTList: query([text], nftList, (owner) => {
         const targetNFTList = nftList.filter((nft) => nft.owner === owner);
         return targetNFTList;
     }),  
