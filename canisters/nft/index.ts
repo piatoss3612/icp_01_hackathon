@@ -14,23 +14,9 @@ import {
     nat,
     Principal,
 } from 'azle';
-
-const MetaData = Record({
-    name: text,
-    description: text,
-    image: blob,
-});
+import { MetaData, Nft } from './types';
 
 const MetaDataList: Vec<typeof MetaData> = [];
-
-const Nft = Record({
-    id: nat,
-    owner: Principal,
-    metaData: MetaData,
-    artist: text,
-    price: nat,
-    onSale: bool
-});
 
 const NftList: Vec<typeof Nft> = [];
 
@@ -57,7 +43,7 @@ export default Canister({
 
     // balance 조회(유저가 가진 nft 개수)
     getBalance: query([Principal], nat16, (owner) => {
-        const targetNFTList = NftList.filter((nft) => nft.owner === owner);
+        const targetNFTList = NftList.filter((nft) => nft.owner.compareTo(owner) === 'eq');
         return targetNFTList.length;
     }),
 
@@ -92,7 +78,10 @@ export default Canister({
 
     // 나의 nft 조회
     getMyNFTList: query([Principal], Vec(Nft), (owner) => {
-        const targetNFTList = NftList.filter((nft) => nft.owner === owner);
+        const targetNFTList = NftList.filter((nft) => nft.owner.compareTo(owner) === 'eq');
         return targetNFTList;
+    }),
+    getAllNFTList: query([], Vec(Nft), () => {
+        return NftList;
     }),
 });

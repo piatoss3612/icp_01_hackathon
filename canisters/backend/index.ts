@@ -17,6 +17,8 @@ import {
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
+import {metadata, name, decimals, symbol, fee, total_supply, balance_of, transfer, approve, allowance, transfer_from} from './token'
+import {  Account } from 'azle/canisters/icrc';
 
 let userMap = StableBTreeMap(text, User, 0);
 let exhibitionMap = StableBTreeMap(text, Exhibition, 0);
@@ -72,9 +74,10 @@ const findComment = (id: text) => {
 }
 
 import NftCanister from "../nft";
+import { Subaccount } from 'azle/canisters/icrc';
 
 const nftCanister = NftCanister(
-    Principal.fromText('bkyz2-fmaaa-aaaaa-qaaaq-cai')
+    Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai')
 );
 
 
@@ -250,6 +253,14 @@ export default Canister({
 
         // 4. 전시장 생성 비용 지불
         // TODO: call ledger canister
+        // caller가 cost 만큼의 ICX를 canister에게 전송
+        const ownerAccount : typeof Account = {
+                owner: Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai"),
+            };
+        const createExhibition = transfer({    
+            to: ownerAccount,
+            value: cost,
+        });
 
         // 5. 전시장 id 및 티켓 id 생성
         const exhibitionId = generateRandomUUID();
@@ -381,10 +392,19 @@ export default Canister({
         const ticket = findTicket(exhibition.ticketId);
 
         // 7. 티켓 구매 (TODO: call ledger canister)
+        // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
+        const exhibitionOwnerAccount: typeof Account = {
+            owner: exhibition.owner,           
+        }
+        const buyTicket = transfer({
+            to: exhibitionOwnerAccount,
+            value: ticket.price,
+        });
 
         // 7-2. 티켓 NFT mint
         const metaData = createMetaData(exhibition.name, exhibition.description, ticket.image);
         const nftId = mintNFT(Principal.fromText(caller), caller, ticket.price);
+
         // 8. 티켓 저장
         user.tickets.push(ticket.id);
 
@@ -421,6 +441,15 @@ export default Canister({
         const price = artwork.price;
 
         // 8. 작품 구매 (TODO: call ledger canister)
+        // 8-1. 작품 가격만큼의 ICX를 artwork.owner에게 전송
+        const buyArtwork = transfer({
+            to: Principal.fromText(exhibition.owner),
+            value: price,
+        });
+
+        // 8-2. 작품 NFT mint       
+        const metaData = createMetaData(artwork.name, artwork.description, artwork.image);
+        const nftId = mintNFT(Principal.fromText(caller), caller, price);
 
         artwork.onSale = false;
 

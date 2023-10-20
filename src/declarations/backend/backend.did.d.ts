@@ -30,7 +30,7 @@ export interface _SERVICE {
     [string],
     [] | [
       {
-        'id' : string,
+        'id' : Principal,
         'exhibitions' : Array<string>,
         'tickets' : Array<string>,
         'name' : string,
@@ -44,7 +44,7 @@ export interface _SERVICE {
     [] | [
       {
         'id' : string,
-        'owner' : string,
+        'owner' : Principal,
         'name' : string,
         'description' : string,
         'image' : Uint8Array | number[],
@@ -60,7 +60,7 @@ export interface _SERVICE {
     Array<
       {
         'id' : string,
-        'owner' : string,
+        'owner' : Principal,
         'name' : string,
         'description' : string,
         'image' : Uint8Array | number[],
@@ -88,7 +88,7 @@ export interface _SERVICE {
     [] | [
       {
         'id' : string,
-        'owner' : string,
+        'owner' : Principal,
         'name' : string,
         'description' : string,
         'artworks' : Array<string>,
@@ -103,7 +103,7 @@ export interface _SERVICE {
     Array<
       {
         'id' : string,
-        'owner' : string,
+        'owner' : Principal,
         'name' : string,
         'description' : string,
         'artworks' : Array<string>,
@@ -127,7 +127,7 @@ export interface _SERVICE {
     [string],
     [] | [
       {
-        'id' : string,
+        'id' : Principal,
         'exhibitions' : Array<string>,
         'tickets' : Array<string>,
         'name' : string,
@@ -141,7 +141,7 @@ export interface _SERVICE {
     Array<
       {
         'id' : string,
-        'owner' : string,
+        'owner' : Principal,
         'name' : string,
         'description' : string,
         'image' : Uint8Array | number[],
@@ -169,7 +169,7 @@ export interface _SERVICE {
     Array<
       {
         'id' : string,
-        'owner' : string,
+        'owner' : Principal,
         'name' : string,
         'description' : string,
         'artworks' : Array<string>,
