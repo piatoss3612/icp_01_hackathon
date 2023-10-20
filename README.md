@@ -1,5 +1,14 @@
 # ICP 01 Hackathon
 
+## Table of Contents
+
+- [Team Members](#team-members)
+- [Introduction](#introduction)
+- [How to run](#how-to-run)
+  - [Requirements](#requirements)
+  - [Steps](#steps)
+- [References](#references)
+
 ## Team Members
 
 | <img src="https://avatars.githubusercontent.com/u/61569834?v=4" width="150" height="150"/> | <img src="https://avatars.githubusercontent.com/u/126757767?v=4" width="150" height="150"/> |
