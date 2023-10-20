@@ -1,91 +1,140 @@
 import {
-    blob,
     bool,
     Canister,
-    Func,
-    nat16,
     None,
     Opt,
     query,
-    Record,
+    Some,
+    StableBTreeMap,
     text,
-    Tuple,
-    Variant,
+    update,
     Vec
 } from 'azle';
+import { Artwork, Comment, Exhibition, Ticket, User } from './types';
+import { getCaller } from './utils';
 
-const Token = Record({
-    // add whatever fields you'd like
-    arbitrary_data: text
-});
-
-const StreamingCallbackHttpResponse = Record({
-    body: blob,
-    token: Opt(Token)
-});
-
-export const Callback = Func([text], StreamingCallbackHttpResponse, 'query');
-
-const CallbackStrategy = Record({
-    callback: Callback,
-    token: Token
-});
-
-const StreamingStrategy = Variant({
-    Callback: CallbackStrategy
-});
-
-type HeaderField = [text, text];
-const HeaderField = Tuple(text, text);
-
-const HttpResponse = Record({
-    status_code: nat16,
-    headers: Vec(HeaderField),
-    body: blob,
-    streaming_strategy: Opt(StreamingStrategy),
-    upgrade: Opt(bool)
-});
-
-const HttpRequest = Record({
-    method: text,
-    url: text,
-    headers: Vec(HeaderField),
-    body: blob,
-    certificate_version: Opt(nat16)
-});
+let userMap = StableBTreeMap(text, User, 0);
+let exhibitionMap = StableBTreeMap(text, Exhibition, 0);
+let artworkMap = StableBTreeMap(text, Artwork, 0);
+let ticketMap = StableBTreeMap(text, Ticket, 0);
+let commentMap = StableBTreeMap(text, Comment, 0);
 
 export default Canister({
-    http_request: query([HttpRequest], HttpResponse, (req) => {
-        if (req.method != "GET") {
-            return {
-                status_code: 405,
-                headers: [
-                    ["Content-Type", "plain/text"],
-                    ["Access-Control-Allow-Origin", "*"],
-                ],
-                body: Buffer.from('Method Not Allowed'),
-                streaming_strategy: None,
-                upgrade: None
-            };
+    // 1. 유저 정보 조회 (유저 id) -> Opt<User> 타입 리턴
+    getUser: query([text], Opt(User), (id) => {
+        return userMap.get(id);
+    }),
+    // 2. 전시장 정보 조회 (전시장 id) -> Vec<Exhibition> 타입 리턴
+    getUserExhibitions: query([text], Vec(Exhibition), (id) => {
+        // 1. 유저 존재하는지 확인
+        const userOpt = userMap.get(id);
+        if ("None" in userOpt) {
+            return [];
         }
 
-        let obj = {};
-        for (let [key, value] of req.headers) {
-            obj[key] = value;
+        const user = userOpt.Some;
+
+        // 2. 유저가 전시한 전시장들 조회
+        const exhibitions: typeof Exhibition[] = [];
+
+        for (let i = 0; i < user.exhibitions.length; i++) {
+            const exhibitionOpt = exhibitionMap.get(user.exhibitions[i]);
+            if (!("None" in exhibitionOpt)) {
+                exhibitions.push(exhibitionOpt.Some);
+            }
         }
 
-        let headers = JSON.stringify(obj);
+        return exhibitions;
+    }),
+    // 3. 작품 정보 조회 (작품 id) -> Vec<Artwork> 타입 리턴 
+    getUserArtworks: query([text], Vec(Artwork), (id) => {
+        // 1. 유저 존재하는지 확인
+        const userOpt = userMap.get(id);
+        if ("None" in userOpt) {
+            return [];
+        }
 
+        const user = userOpt.Some;
 
-        return {
-            status_code: 200,
-            headers: [
-                ["Content-Type", "application/json"],
-                ["Access-Control-Allow-Origin", "*"],
-            ],
-            body: Buffer.from(headers),
-            streaming_strategy: None,
-            upgrade: None
-        };
+        // 2. 유저가 소유한 작품들 조회
+        const artworks: typeof Artwork[] = [];
+
+        for (let i = 0; i < user.artWorks.length; i++) {
+            const artworkOpt = artworkMap.get(user.artWorks[i]);
+            if (!("None" in artworkOpt)) {
+                artworks.push(artworkOpt.Some);
+            }
+        }
+
+        return artworks;
+    }),
+    // 4. 티켓 정보 조회 (티켓 id) -> Vec<Ticket> 타입 리턴
+    getUserTickets: query([text], Vec(Ticket), (id) => {
+        // 1. 유저 존재하는지 확인
+        const userOpt = userMap.get(id);
+        if ("None" in userOpt) {
+            return [];
+        }
+
+        const user = userOpt.Some;
+
+        // 2. 유저가 소유한 티켓들 조회
+        const tickets: typeof Ticket[] = [];
+
+        for (let i = 0; i < user.tickets.length; i++) {
+            const ticketOpt = ticketMap.get(user.tickets[i]);
+            if (!("None" in ticketOpt)) {
+                tickets.push(ticketOpt.Some);
+            }
+        }
+
+        return tickets;
+    }),
+    // 5. 감상평 정보 조회 (감상평 id) -> Vec<Comment> 타입 리턴
+    getUserComments: query([text], Vec(Comment), (id) => {
+        // 1. 유저 존재하는지 확인
+        const userOpt = userMap.get(id);
+        if ("None" in userOpt) {
+            return [];
+        }
+
+        const user = userOpt.Some;
+
+        // 2. 유저가 작성한 감상평들 조회
+        const comments: typeof Comment[] = [];
+
+        for (let i = 0; i < user.tickets.length; i++) {
+            const commentOpt = commentMap.get(user.comments[i]);
+            if (!("None" in commentOpt)) {
+                comments.push(commentOpt.Some);
+            }
+        }
+
+        return comments;
+    }),
+    // 6. 유저 생성 (이름만 입력) -> bool 타입 리턴
+    createUser: update([text], Opt(User), async (name) => {
+        // 1. 유저 principal 확인
+        const caller = getCaller();
+
+        // 2. 유저가 존재하는지 확인
+        if (userMap.containsKey(caller)) {
+            return None;
+        }
+
+        // 3. 유저 생성
+        const user: typeof User = {
+            id: caller,
+            name,
+            exhibitions: [],
+            artWorks: [],
+            tickets: [],
+            comments: [],
+        }
+
+        // 4. 유저 저장
+        userMap.insert(caller, user);
+
+        return Some(user);
     }),
 });
