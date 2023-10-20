@@ -31,14 +31,6 @@ const nft = Record({
 
 const nftList = Vec(nft); 
 
-function getCaller(): string {
-  const caller = ic.caller().toString();
-  if (caller === null) {
-    throw new Error("Caller is null");
-  }
-  return caller;
-}
-
 export default Canister({
     // metaData(메타 데이터 받기, input: name, description, image output: metaData)
     createMetaData: update([text, text, blob], metaData, (name, description, image) => {
@@ -66,25 +58,12 @@ export default Canister({
     }),
 
     // transfer(nft 전송: 유저 간 NFT 전송)
-    transfer: update([text, text, nat16], text, (from, to, id) => {
-        // from account가 존재하는지 확인
-
-        // caller가 from과 같은지 확인(전송은 owner만 가능)
-        const caller = getCaller();
-        if (caller !== from) {
-            return 'caller is not owner';
-        }
-
+    transfer: update([text, nat16], text, (to, id) => {
         // nft id가 존재하는지 확인
         const targetNFT = nftList.find((nft) => nft.id === id);
         if (!targetNFT) {
             return 'nft is not exist';
         }
-        // 해당 nft의 owner가 from과 같은지 확인
-        if (targetNFT.owner !== from) {
-            return 'owner is not same';
-        }
-        // toAccount가 존재하는지 확인, 없다면 계정 생성
 
         // owner 변경 == 전송
         targetNFT.owner = to;
