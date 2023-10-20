@@ -28,7 +28,7 @@ const Nft = Record({
     owner: Principal,
     metaData: MetaData,
     artist: text,
-    price: nat16,
+    price: nat,
     onSale: bool
 });
 
@@ -76,7 +76,7 @@ export default Canister({
     }),
 
     // mint(받는 사람 지갑으로 NFT 생성)
-    mintNFT: update([Principal, text, nat16], nat, (owner, artist, price) => {
+    mintNFT: update([Principal, text, nat], nat, (owner, artist, price) => {
         const newNFT: typeof Nft = {
             owner: owner,
             id: BigInt(NftList.length),
