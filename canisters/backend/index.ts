@@ -87,5 +87,5 @@ export default Canister({
             streaming_strategy: None,
             upgrade: None
         };
-    })
+    }),
 });
