@@ -10,6 +10,9 @@ ii:
 ledger:
 	./scripts/ledger.sh
 
+nft:
+	dfx deploy nft
+
 backends:
 	dfx deploy backend
 	dfx generate backend

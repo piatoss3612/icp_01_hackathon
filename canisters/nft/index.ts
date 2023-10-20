@@ -8,82 +8,91 @@ import {
     text,
     Vec,
     update,
+    Opt,
+    None,
+    Some,
+    nat,
+    Principal,
 } from 'azle';
 
-const metaData = Record({
+const MetaData = Record({
     name: text,
     description: text,
     image: blob,
 });
 
-const metaDataList = Vec(metaData);
+const MetaDataList: Vec<typeof MetaData> = [];
 
-const nft = Record({
-    id: nat16,
-    owner: text,
-    metaData: metaData,
+const Nft = Record({
+    id: nat,
+    owner: Principal,
+    metaData: MetaData,
     artist: text,
     price: nat16,
     onSale: bool
 });
 
-const nftList = Vec(nft); 
+const NftList: Vec<typeof Nft> = [];
 
 export default Canister({
     // metaData(메타 데이터 받기, input: name, description, image output: metaData)
-    createMetaData: update([text, text, blob], metaData, (name, description, image) => {
-        const newMetaData: typeof metaData = {
+    createMetaData: update([text, text, blob], MetaData, (name, description, image) => {
+        const newMetaData: typeof MetaData = {
             name: name,
             description: description,
-            image: new Uint8Array(image),
+            image: image,
         };
-        metaDataList.push(newMetaData);
-        return newMetaData;;
+        let idx = MetaDataList.push(newMetaData);
+        return newMetaData;
     }),
     // getMetaData(메타 데이터 조회)
-    getMetaDataList: query([text], metaData, (name) => {
-        const targetMetaData = metaDataList.find((metaData) => metaData.name === name);
+    getMetaDataList: query([text], Opt(MetaData), (name) => {
+        const targetMetaData = MetaDataList.find((metaData) => metaData.name === name);
         if (!targetMetaData) {
-            return null;
+            return None;
         }
-        return targetMetaData;
+
+        return Some(targetMetaData);
     }),
 
     // balance 조회(유저가 가진 nft 개수)
-    getBalance: query([text], nat16, (owner) => {
-        const targetNFTList = nftList.filter((nft) => nft.owner === owner);
+    getBalance: query([Principal], nat16, (owner) => {
+        const targetNFTList = NftList.filter((nft) => nft.owner === owner);
         return targetNFTList.length;
     }),
 
     // transfer(nft 전송: 유저 간 NFT 전송)
-    transfer: update([text, nat16], text, (to, id) => {
+    transfer: update([Principal, nat], bool, (to, id) => {
         // nft id가 존재하는지 확인
-        const targetNFT = nftList.find((nft) => nft.id === id);
+        const targetNFT = NftList.find((nft) => nft.id === id);
         if (!targetNFT) {
-            return 'nft is not exist';
+            throw new Error('NFT not found');
         }
 
         // owner 변경 == 전송
         targetNFT.owner = to;
+
+        return true;
     }),
 
     // mint(받는 사람 지갑으로 NFT 생성)
-    mintNFT: update([text, text, nat16], nat16, (owner, artist, price) => {
-        const newNFT: typeof nft = {
+    mintNFT: update([Principal, text, nat16], nat, (owner, artist, price) => {
+        const newNFT: typeof Nft = {
             owner: owner,
-            id: nftList.length,
-            metaData: metaData[metaDataList.length],
+            id: BigInt(NftList.length),
+            metaData: MetaData[MetaDataList.length],
             artist: artist,
             price: price,
+            onSale: false,
         };
 
-        nftList.push(newNFT);
-        return newNFT.id;
+        NftList.push(newNFT);
+        return BigInt(newNFT.id);
     }),
 
     // 나의 nft 조회
-    getMyNFTList: query([text], nftList, (owner) => {
-        const targetNFTList = nftList.filter((nft) => nft.owner === owner);
+    getMyNFTList: query([Principal], Vec(Nft), (owner) => {
+        const targetNFTList = NftList.filter((nft) => nft.owner === owner);
         return targetNFTList;
-    }),  
+    }),
 });
