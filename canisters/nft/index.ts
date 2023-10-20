@@ -57,7 +57,7 @@ export default Canister({
 
     // balance 조회(유저가 가진 nft 개수)
     getBalance: query([Principal], nat16, (owner) => {
-        const targetNFTList = NftList.filter((nft) => nft.owner === owner);
+        const targetNFTList = NftList.filter((nft) => nft.owner.compareTo(owner) === 'eq');
         return targetNFTList.length;
     }),
 
@@ -92,7 +92,10 @@ export default Canister({
 
     // 나의 nft 조회
     getMyNFTList: query([Principal], Vec(Nft), (owner) => {
-        const targetNFTList = NftList.filter((nft) => nft.owner === owner);
+        const targetNFTList = NftList.filter((nft) => nft.owner.compareTo(owner) === 'eq');
         return targetNFTList;
+    }),
+    getAllNFTList: query([], Vec(Nft), () => {
+        return NftList;
     }),
 });
