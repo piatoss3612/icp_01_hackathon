@@ -10,10 +10,14 @@ import {
     StableBTreeMap,
     text,
     update,
-    Vec
+    Vec,
+    ic
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
+import NftCanister from "../nft";
+
+let nftCanister = typeof NftCanister;
 
 let userMap = StableBTreeMap(text, User, 0);
 let exhibitionMap = StableBTreeMap(text, Exhibition, 0);
@@ -66,6 +70,27 @@ const findComment = (id: text) => {
     }
 
     return commentOpt.Some;
+}
+
+const mintNFT = async (owner: text, artist: text, price: nat) => {
+    const nftId = await ic.call(nftCanister.mintNFT, {
+        args: [owner, artist, price],
+    });
+    return nftId;
+}
+
+const getNftCollection = async (owner: text) => {
+    const nftList = await ic.call(nftCanister.getMyNFTList, {
+        args: [owner],
+    });
+    return nftList;
+}
+
+const createMetaData = async (name: text, description: text, image: blob) => {
+    const metaData = await ic.call(nftCanister.createMetaData, {
+        args: [name, description, image],
+    });
+    return metaData;
 }
 
 export default Canister({
@@ -351,6 +376,9 @@ export default Canister({
 
         // 7. 티켓 구매 (TODO: call ledger canister)
 
+        // 7-2. 티켓 NFT mint
+        const metaData = createMetaData(exhibition.name, exhibition.description, ticket.image);
+        const nftId = mintNFT(caller, caller, ticket.price);
         // 8. 티켓 저장
         user.tickets.push(ticket.id);
 

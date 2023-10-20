@@ -8,31 +8,21 @@ export interface _SERVICE {
   'closeExhibition' : ActorMethod<[string], boolean>,
   'createExhibition' : ActorMethod<
     [
-      string,
-      string,
-      Array<
-        {
-          'id' : string,
-          'owner' : string,
-          'name' : string,
-          'description' : string,
-          'image' : Uint8Array | number[],
-          'comments' : Array<
-            {
-              'id' : string,
-              'content' : string,
-              'owner' : string,
-              'adopted' : boolean,
-              'exhibition' : string,
-            }
-          >,
-          'price' : bigint,
-          'onSale' : boolean,
-          'exhibition' : string,
-        }
-      >,
-      bigint,
-      Uint8Array | number[],
+      {
+        'name' : string,
+        'description' : string,
+        'artworks' : Array<
+          {
+            'name' : string,
+            'description' : string,
+            'image' : Uint8Array | number[],
+            'price' : bigint,
+            'onSale' : boolean,
+          }
+        >,
+        'ticketImage' : Uint8Array | number[],
+        'ticketPrice' : bigint,
+      },
     ],
     string
   >,
@@ -58,20 +48,40 @@ export interface _SERVICE {
         'name' : string,
         'description' : string,
         'image' : Uint8Array | number[],
-        'comments' : Array<
-          {
-            'id' : string,
-            'content' : string,
-            'owner' : string,
-            'adopted' : boolean,
-            'exhibition' : string,
-          }
-        >,
+        'comments' : Array<string>,
         'price' : bigint,
         'onSale' : boolean,
         'exhibition' : string,
       }
     ]
+  >,
+  'getArtworks' : ActorMethod<
+    [string],
+    Array<
+      {
+        'id' : string,
+        'owner' : string,
+        'name' : string,
+        'description' : string,
+        'image' : Uint8Array | number[],
+        'comments' : Array<string>,
+        'price' : bigint,
+        'onSale' : boolean,
+        'exhibition' : string,
+      }
+    >
+  >,
+  'getComments' : ActorMethod<
+    [string],
+    Array<
+      {
+        'id' : string,
+        'content' : string,
+        'owner' : string,
+        'adopted' : boolean,
+        'exhibition' : string,
+      }
+    >
   >,
   'getExhibition' : ActorMethod<
     [string],
@@ -81,33 +91,27 @@ export interface _SERVICE {
         'owner' : string,
         'name' : string,
         'description' : string,
-        'artworks' : Array<
-          {
-            'id' : string,
-            'owner' : string,
-            'name' : string,
-            'description' : string,
-            'image' : Uint8Array | number[],
-            'comments' : Array<
-              {
-                'id' : string,
-                'content' : string,
-                'owner' : string,
-                'adopted' : boolean,
-                'exhibition' : string,
-              }
-            >,
-            'price' : bigint,
-            'onSale' : boolean,
-            'exhibition' : string,
-          }
-        >,
+        'artworks' : Array<string>,
         'ticketId' : string,
         'onExhibition' : boolean,
       }
     ]
   >,
   'getExhibitionCost' : ActorMethod<[], bigint>,
+  'getExhibitions' : ActorMethod<
+    [],
+    Array<
+      {
+        'id' : string,
+        'owner' : string,
+        'name' : string,
+        'description' : string,
+        'artworks' : Array<string>,
+        'ticketId' : string,
+        'onExhibition' : boolean,
+      }
+    >
+  >,
   'getTicket' : ActorMethod<
     [string],
     [] | [
@@ -119,7 +123,6 @@ export interface _SERVICE {
       }
     ]
   >,
-  'getTokenName' : ActorMethod<[], string>,
   'getUser' : ActorMethod<
     [string],
     [] | [
@@ -142,15 +145,7 @@ export interface _SERVICE {
         'name' : string,
         'description' : string,
         'image' : Uint8Array | number[],
-        'comments' : Array<
-          {
-            'id' : string,
-            'content' : string,
-            'owner' : string,
-            'adopted' : boolean,
-            'exhibition' : string,
-          }
-        >,
+        'comments' : Array<string>,
         'price' : bigint,
         'onSale' : boolean,
         'exhibition' : string,
@@ -177,27 +172,7 @@ export interface _SERVICE {
         'owner' : string,
         'name' : string,
         'description' : string,
-        'artworks' : Array<
-          {
-            'id' : string,
-            'owner' : string,
-            'name' : string,
-            'description' : string,
-            'image' : Uint8Array | number[],
-            'comments' : Array<
-              {
-                'id' : string,
-                'content' : string,
-                'owner' : string,
-                'adopted' : boolean,
-                'exhibition' : string,
-              }
-            >,
-            'price' : bigint,
-            'onSale' : boolean,
-            'exhibition' : string,
-          }
-        >,
+        'artworks' : Array<string>,
         'ticketId' : string,
         'onExhibition' : boolean,
       }
