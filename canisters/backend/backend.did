@@ -9,7 +9,6 @@ service: () -> {
     getExhibition: (text) -> (opt record {id:text; owner:text; name:text; description:text; artworks:vec record {id:text; owner:text; name:text; description:text; image:vec nat8; comments:vec record {id:text; content:text; owner:text; adopted:bool; exhibition:text}; price:nat; onSale:bool; exhibition:text}; ticketId:text; onExhibition:bool}) query;
     getExhibitionCost: () -> (nat) query;
     getTicket: (text) -> (opt record {id:text; image:vec nat8; price:nat; exhibition:text}) query;
-    getTokenName: () -> (text) query;
     getUser: (text) -> (opt record {id:text; exhibitions:vec text; tickets:vec text; name:text; comments:vec text; artWorks:vec text}) query;
     getUserArtworks: (text) -> (vec record {id:text; owner:text; name:text; description:text; image:vec nat8; comments:vec record {id:text; content:text; owner:text; adopted:bool; exhibition:text}; price:nat; onSale:bool; exhibition:text}) query;
     getUserComments: (text) -> (vec record {id:text; content:text; owner:text; adopted:bool; exhibition:text}) query;
