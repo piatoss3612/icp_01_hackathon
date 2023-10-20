@@ -30,7 +30,7 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Opt(
             IDL.Record({
-              'id' : IDL.Text,
+              'id' : IDL.Principal,
               'exhibitions' : IDL.Vec(IDL.Text),
               'tickets' : IDL.Vec(IDL.Text),
               'name' : IDL.Text,
@@ -47,7 +47,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(
             IDL.Record({
               'id' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'image' : IDL.Vec(IDL.Nat8),
@@ -66,7 +66,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'image' : IDL.Vec(IDL.Nat8),
@@ -100,7 +100,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(
             IDL.Record({
               'id' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
@@ -118,7 +118,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
@@ -148,7 +148,7 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Opt(
             IDL.Record({
-              'id' : IDL.Text,
+              'id' : IDL.Principal,
               'exhibitions' : IDL.Vec(IDL.Text),
               'tickets' : IDL.Vec(IDL.Text),
               'name' : IDL.Text,
@@ -165,7 +165,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'image' : IDL.Vec(IDL.Nat8),
@@ -199,7 +199,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
