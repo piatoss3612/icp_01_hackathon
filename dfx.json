@@ -17,6 +17,9 @@
             "wasm": "canisters/ledger/ledger.wasm"
         },
         "backend": {
+            "dependencies": [
+                "ledger"
+            ],
             "type": "custom",
             "main": "canisters/backend/index.ts",
             "candid": "canisters/backend/backend.did",

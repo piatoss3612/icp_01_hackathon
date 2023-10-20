@@ -66,21 +66,6 @@ function App() {
     }
   }
 
-  const request = async () => {
-    let url = `http://127.0.0.1:4943/?canisterId=${backendId}`;
-    try {
-      const resp = await fetch(url);
-      if (resp.status !== 200) {
-        throw new Error("Invalid status code: " + resp.status);
-      }
-
-      const body = await resp.json();
-      console.log(body);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   const whoami = async () => {
     // const agent = new HttpAgent({ identity });
     // const backend = Actor.createActor(idlFactory, {

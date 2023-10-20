@@ -1,3 +1,8 @@
 service: () -> {
-    http_request: (record {url:text; method:text; body:vec nat8; headers:vec record {text; text}; certificate_version:opt nat16}) -> (record {body:vec nat8; headers:vec record {text; text}; upgrade:opt bool; streaming_strategy:opt variant {Callback:record {token:record {arbitrary_data:text}; callback:func (text) -> (record {token:opt record {arbitrary_data:text}; body:vec nat8}) query}}; status_code:nat16}) query;
+    createUser: (text) -> (opt record {id:text; exhibitions:vec text; tickets:vec text; name:text; comments:vec text; artWorks:vec text});
+    getUser: (text) -> (opt record {id:text; exhibitions:vec text; tickets:vec text; name:text; comments:vec text; artWorks:vec text}) query;
+    getUserArtworks: (text) -> (vec record {owner:text; name:text; description:text; image:vec nat8; comments:vec record {content:text; owner:text; adapted:bool; exhibition:text}; price:nat; onSale:bool; exhibition:text}) query;
+    getUserComments: (text) -> (vec record {content:text; owner:text; adapted:bool; exhibition:text}) query;
+    getUserExhibitions: (text) -> (vec record {id:text; owner:text; name:text; description:text; artworks:vec record {owner:text; name:text; description:text; image:vec nat8; comments:vec record {content:text; owner:text; adapted:bool; exhibition:text}; price:nat; onSale:bool; exhibition:text}; onExhibition:bool; ticketImage:vec nat8; ticketPrice:nat}) query;
+    getUserTickets: (text) -> (vec record {id:text; image:vec nat8; price:nat; exhibition:text}) query;
 }

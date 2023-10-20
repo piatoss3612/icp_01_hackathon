@@ -8,8 +8,6 @@ import {
     text,
     Vec,
     update,
-    ic,
-    
 } from 'azle';
 
 const metaData = Record({
