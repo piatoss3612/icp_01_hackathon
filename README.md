@@ -18,7 +18,7 @@
 
 ## Introduction
 
-### <Project>
+### Project Name
 
 - You can create your own exhibition and sell your art works
 - You can buy tickets to visit other artists' exhibitions
@@ -33,10 +33,10 @@
 
 ### Requirements
 
-- Node.js
-- npm
-- dfx
-- Make
+- [Node.js](https://nodejs.org/ko/download)
+- [npm](https://docs.npmjs.com/getting-started)
+- [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/)
+- [Make](https://www.gnu.org/software/make/)
 
 ### Steps
 
