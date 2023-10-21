@@ -16,7 +16,7 @@ import {
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
 import { transfer, transfer_from } from './token'
-import { mintNFT } from './nft'
+import { mintNFT, getMyNFTList } from './nft'
 import { Account } from 'azle/canisters/icrc';
 
 const BackendCanisterId = Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai");
@@ -273,7 +273,7 @@ export default Canister({
             name: args.name,
             description: args.description,
             artworks: artworks,
-            onExhibition: false,
+            onExhibition: true,
         }
 
         // 8. 티켓 생성
