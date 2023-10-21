@@ -15,9 +15,11 @@ import {
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
-import { transfer } from './token'
+import { transfer, transfer_from } from './token'
 import { mintNFT } from './nft'
 import { Account } from 'azle/canisters/icrc';
+
+const BackendCanisterId = Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai");
 
 // 메모리 내에 저장되는 데이터
 let userMap = StableBTreeMap(text, User, 0);
@@ -151,7 +153,6 @@ export default Canister({
         // 1. 유저 principal 확인
         const caller = getCaller();
 
-
         // 2. 유저가 존재하는지 확인
         if (userMap.containsKey(caller)) {
             return None;
@@ -225,7 +226,7 @@ export default Canister({
         // 4. 전시장 생성 비용 지불
         // caller가 cost 만큼의 ICX를 canister에게 전송
         const ownerAccount: typeof Account = {
-            owner: Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai"),
+            owner: BackendCanisterId,
             subaccount: None,
         };
 
@@ -236,7 +237,6 @@ export default Canister({
             fee: None,
             memo: None,
             created_at_time: None,
-
         });
 
         // 5. 전시장 id 및 티켓 id 생성
@@ -368,7 +368,7 @@ export default Canister({
         // 6. 전시장 티켓 가격 확인
         const ticket = findTicket(exhibition.ticketId);
 
-        // 7. 티켓 구매 (TODO: call ledger canister)
+        // 7. 티켓 구매
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
         const exhibitionOwnerAccount: typeof Account = {
             owner: exhibition.owner,
@@ -422,7 +422,7 @@ export default Canister({
         // 7. 작품 가격 확인
         const price = artwork.price;
 
-        // 8. 작품 구매 (TODO: call ledger canister)
+        // 8. 작품 구매
         const exhibitionOwnerAccount: typeof Account = {
             owner: exhibition.owner,
             subaccount: None,
@@ -552,14 +552,19 @@ export default Canister({
         comment.adopted = true;
 
         // 10. 채택 보상 지급
-        const commentOwnerAccount: typeof Account = {
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
+            subaccount: None,
+        };
+
+        const toAccount: typeof Account = {
             owner: comment.owner,
             subaccount: None,
         }
 
-        const adoptionReward = await transfer({
-            from_subaccount: None,
-            to: commentOwnerAccount,
+        const adoptionReward = await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: reward,
             fee: None,
             memo: None,
