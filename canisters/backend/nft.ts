@@ -26,8 +26,17 @@ const createMetaData = async (name: text, description: text, image: blob) => {
     return metaData;
 }
 
+const getMyNFTList = async (owner: Principal) => {
+    const myNFTList = await ic.call(nftCanister.getMyNFTList, {
+        args: [owner],
+    })
+
+    return myNFTList;
+}
+
 export {
     mintNFT,
     getNftCollection,
     createMetaData,
+    getMyNFTList
 }
