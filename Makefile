@@ -29,3 +29,10 @@ stop:
 create_users:
 	./scripts/create_users.sh
 
+.PHONY: create_exhibition
+create_exhibition:
+	./scripts/create_exhibition.sh
+
+.PHONY: buy_artwork
+buy_artwork:
+	./scripts/buy_artwork.sh

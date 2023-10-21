@@ -38,12 +38,6 @@ dfx canister call backend getArtworks "("${EXHIBITION_ID}")"
 
 # export ID= "8c01398214444904b60fbfe7b0aa76d8"
 
-# buy Artwork
-dfx canister call backend buyArtwork "(${EXHIBITION_ID}, \"e4365e30-2888-4801-a94f-966cd4e0e984\")"
-
-# get Artwork
-dfx canister call backend getUserArtworks "( \"${BOB}\")"
-
 
 
 
