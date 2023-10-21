@@ -13,11 +13,13 @@ ledger:
 nft:
 	dfx deploy nft
 
-backends:
+.PHONY: backend
+backend:
 	dfx deploy backend
 	dfx generate backend
 
-frontends:
+.PHONY: frontend
+frontend:
 	dfx deploy frontend
 
 stop:
