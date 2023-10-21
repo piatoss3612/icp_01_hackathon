@@ -16,8 +16,17 @@
             "candid": "canisters/ledger/ledger.did",
             "wasm": "canisters/ledger/ledger.wasm"
         },
+        "nft": {
+            "type": "custom",
+            "main": "canisters/nft/index.ts",
+            "candid": "canisters/nft/nft.did",
+            "build": "npx azle nft",
+            "wasm": ".azle/nft/nft.wasm",
+            "gzip": true
+        },
         "backend": {
             "dependencies": [
+                "nft",
                 "ledger"
             ],
             "type": "custom",
@@ -25,14 +34,6 @@
             "candid": "canisters/backend/backend.did",
             "build": "npx azle backend",
             "wasm": ".azle/backend/backend.wasm",
-            "gzip": true
-        },
-        "nft": {
-            "type": "custom",
-            "main": "canisters/nft/index.ts",
-            "candid": "canisters/nft/nft.did",
-            "build": "npx azle nft",
-            "wasm": ".azle/nft/nft.wasm",
             "gzip": true
         },
         "frontend": {

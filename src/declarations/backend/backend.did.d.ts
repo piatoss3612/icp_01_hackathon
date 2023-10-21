@@ -2,7 +2,7 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export interface _SERVICE {
-  'adoptComment' : ActorMethod<[string, string, string], boolean>,
+  'adoptComment' : ActorMethod<[string, string, string, bigint], boolean>,
   'buyArtwork' : ActorMethod<[string, string], boolean>,
   'buyTicket' : ActorMethod<[string], boolean>,
   'closeExhibition' : ActorMethod<[string], boolean>,
@@ -77,7 +77,7 @@ export interface _SERVICE {
       {
         'id' : string,
         'content' : string,
-        'owner' : string,
+        'owner' : Principal,
         'adopted' : boolean,
         'exhibition' : string,
       }
@@ -158,7 +158,7 @@ export interface _SERVICE {
       {
         'id' : string,
         'content' : string,
-        'owner' : string,
+        'owner' : Principal,
         'adopted' : boolean,
         'exhibition' : string,
       }
