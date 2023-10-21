@@ -273,7 +273,7 @@ export default Canister({
             name: args.name,
             description: args.description,
             artworks: artworks,
-            onExhibition: false,
+            onExhibition: true,
         }
 
         // 8. 티켓 생성
