@@ -24,3 +24,8 @@ frontend:
 
 stop:
 	dfx stop
+
+.PHONY: create_users
+create_users:
+	./scripts/create_users.sh
+
