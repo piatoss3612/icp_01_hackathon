@@ -4,6 +4,6 @@ service: () -> {
     getBalance: (principal) -> (nat16) query;
     getMetaDataList: (text) -> (opt record {name:text; description:text; image:vec nat8}) query;
     getMyNFTList: (principal) -> (vec record {id:nat; metaData:record {name:text; description:text; image:vec nat8}; owner:principal; artist:text; price:nat; onSale:bool}) query;
-    mintNFT: (principal, text, nat) -> (nat);
+    mintNFT: (principal, text, text, text, vec nat8, nat) -> (nat);
     transfer: (principal, nat) -> (bool);
 }

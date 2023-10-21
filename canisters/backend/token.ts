@@ -67,7 +67,7 @@ async function allowance(allowArgs: typeof AllowanceArgs) {
 
 async function transfer_from(transferFromArgs: typeof TransferFromArgs) {
     return await ic.call(tokenCanister.icrc2_transfer_from, {
-        args: [trasferFromArgs]
+        args: [transferFromArgs]
     });
 }
 

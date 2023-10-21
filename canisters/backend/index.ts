@@ -17,8 +17,9 @@ import {
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
-import {metadata, name, decimals, symbol, fee, total_supply, balance_of, transfer, approve, allowance, transfer_from} from './token'
-import {  Account } from 'azle/canisters/icrc';
+import { metadata, name, decimals, symbol, fee, total_supply, balance_of, transfer, approve, allowance, transfer_from } from './token'
+import { mintNFT, getNftCollection, createMetaData } from './nft'
+import { Account } from 'azle/canisters/icrc';
 
 let userMap = StableBTreeMap(text, User, 0);
 let exhibitionMap = StableBTreeMap(text, Exhibition, 0);
@@ -71,35 +72,6 @@ const findComment = (id: text) => {
     }
 
     return commentOpt.Some;
-}
-
-import NftCanister from "../nft";
-import { Subaccount } from 'azle/canisters/icrc';
-
-const nftCanister = NftCanister(
-    Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai')
-);
-
-
-const mintNFT= async (owner: Principal, artist: text, price: nat) => {
-    const nftId = await ic.call(nftCanister.mintNFT, {
-        args: [owner, artist, price],
-    });
-    return nftId;
-}
-
-const getNftCollection = async (owner: Principal) => {
-    const nftList = await ic.call(nftCanister.getMyNFTList, {
-        args: [owner],
-    });
-    return nftList;
-}
-
-const createMetaData = async (name: text, description: text, image: blob) => {
-    const metaData = await ic.call(nftCanister.createMetaData, {
-        args: [name, description, image],
-    });
-    return metaData;
 }
 
 export default Canister({
@@ -254,12 +226,18 @@ export default Canister({
         // 4. 전시장 생성 비용 지불
         // TODO: call ledger canister
         // caller가 cost 만큼의 ICX를 canister에게 전송
-        const ownerAccount : typeof Account = {
-                owner: Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai"),
-            };
-        const createExhibition = transfer({    
+        const ownerAccount: typeof Account = {
+            owner: Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai"),
+            subaccount: None,
+        };
+        const createExhibition = transfer({
+            from_subaccount: None,
             to: ownerAccount,
-            value: cost,
+            amount: cost,
+            fee: None,
+            memo: None,
+            created_at_time: None,
+
         });
 
         // 5. 전시장 id 및 티켓 id 생성
@@ -394,16 +372,21 @@ export default Canister({
         // 7. 티켓 구매 (TODO: call ledger canister)
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
         const exhibitionOwnerAccount: typeof Account = {
-            owner: exhibition.owner,           
+            owner: exhibition.owner,
+            subaccount: None,
         }
         const buyTicket = transfer({
+            from_subaccount: None,
             to: exhibitionOwnerAccount,
-            value: ticket.price,
+            amount: ticket.price,
+            fee: None,
+            memo: None,
+            created_at_time: None,
         });
 
         // 7-2. 티켓 NFT mint
-        const metaData = createMetaData(exhibition.name, exhibition.description, ticket.image);
-        const nftId = mintNFT(Principal.fromText(caller), caller, ticket.price);
+        const nftId = mintNFT(Principal.fromText(caller), exhibition.name, exhibition.description,
+            exhibition.owner.toText(), ticket.image, ticket.price);
 
         // 8. 티켓 저장
         user.tickets.push(ticket.id);
@@ -441,15 +424,24 @@ export default Canister({
         const price = artwork.price;
 
         // 8. 작품 구매 (TODO: call ledger canister)
+        const exhibitionOwnerAccount: typeof Account = {
+            owner: exhibition.owner,
+            subaccount: None,
+        }
+
         // 8-1. 작품 가격만큼의 ICX를 artwork.owner에게 전송
         const buyArtwork = transfer({
-            to: Principal.fromText(exhibition.owner),
-            value: price,
+            from_subaccount: None,
+            to: exhibitionOwnerAccount,
+            amount: price,
+            fee: None,
+            memo: None,
+            created_at_time: None,
         });
 
         // 8-2. 작품 NFT mint       
-        const metaData = createMetaData(artwork.name, artwork.description, artwork.image);
-        const nftId = mintNFT(Principal.fromText(caller), caller, price);
+        const nftId = mintNFT(Principal.fromText(caller), artwork.name, artwork.description,
+            exhibition.owner.toText(), artwork.image, price);
 
         artwork.onSale = false;
 
