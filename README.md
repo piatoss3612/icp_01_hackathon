@@ -27,7 +27,9 @@
 
 >  Be a host of your own exhibition with your art works!
 
-- [Slides](https://docs.google.com/presentation/d/1u_sW8k0BL1nrQkMVXKf9CjOWpev7vhN2o9zdhgJZak8/edit?usp=sharing)
+### Slides
+
+- [Link](https://docs.google.com/presentation/d/1u_sW8k0BL1nrQkMVXKf9CjOWpev7vhN2o9zdhgJZak8/edit?usp=sharing)
 
 ## How to run
 
