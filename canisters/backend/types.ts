@@ -3,7 +3,7 @@ import { Record, Vec, bool, nat, text, blob, Principal } from 'azle';
 // 감상평
 const Comment = Record({
     id: text, // 감상평 id
-    owner: text, // 감상평 작성자
+    owner: Principal, // 감상평 작성자
     exhibition: text, // 감상평이 속한 전시장 id
     content: text, // 감상평 내용
     adopted: bool, // 감상평이 채택되었는지

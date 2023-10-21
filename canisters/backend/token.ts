@@ -37,37 +37,37 @@ const fee = async () => {
     return await ic.call(tokenCanister.icrc1_fee);
 }
 
-async function total_supply() {
+const total_supply = async () => {
     return await ic.call(tokenCanister.icrc1_total_supply);
 }
 
-async function balance_of(account: typeof Account) {
+const balance_of = async (account: typeof Account) => {
     return await ic.call(tokenCanister.icrc1_balance_of, {
         args: [account]
     });
 }
 
-async function transfer(transferArgs: typeof TransferArgs) {
+const transfer = async (transferArgs: typeof TransferArgs) => {
     return await ic.call(tokenCanister.icrc1_transfer, {
         args: [transferArgs]
     });
 }
 
-async function approve(approveArgs: typeof ApproveArgs) {
+const approve = async (approveArgs: typeof ApproveArgs) => {
     return await ic.call(tokenCanister.icrc2_approve, {
         args: [approveArgs]
     });
 }
 
-async function allowance(allowArgs: typeof AllowanceArgs) {
+const allowance = async (allowArgs: typeof AllowanceArgs) => {
     return await ic.call(tokenCanister.icrc2_allowance, {
         args: [allowArgs]
     });
 }
 
-async function transfer_from(transferFromArgs: typeof TransferFromArgs) {
+const transfer_from = async (transferFromArgs: typeof TransferFromArgs) => {
     return await ic.call(tokenCanister.icrc2_transfer_from, {
-        args: [trasferFromArgs]
+        args: [transferFromArgs]
     });
 }
 

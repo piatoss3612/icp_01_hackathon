@@ -1,6 +1,10 @@
 export const idlFactory = ({ IDL }) => {
   return IDL.Service({
-    'adoptComment' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
+    'adoptComment' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+        [IDL.Bool],
+        [],
+      ),
     'buyArtwork' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
     'buyTicket' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'closeExhibition' : IDL.Func([IDL.Text], [IDL.Bool], []),
@@ -86,7 +90,7 @@ export const idlFactory = ({ IDL }) => {
             IDL.Record({
               'id' : IDL.Text,
               'content' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'adopted' : IDL.Bool,
               'exhibition' : IDL.Text,
             })
@@ -185,7 +189,7 @@ export const idlFactory = ({ IDL }) => {
             IDL.Record({
               'id' : IDL.Text,
               'content' : IDL.Text,
-              'owner' : IDL.Text,
+              'owner' : IDL.Principal,
               'adopted' : IDL.Bool,
               'exhibition' : IDL.Text,
             })

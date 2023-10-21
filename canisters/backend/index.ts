@@ -12,21 +12,21 @@ import {
     text,
     update,
     Vec,
-    ic,
-    nat16
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
-import {metadata, name, decimals, symbol, fee, total_supply, balance_of, transfer, approve, allowance, transfer_from} from './token'
-import {  Account } from 'azle/canisters/icrc';
+import { transfer } from './token'
+import { mintNFT } from './nft'
+import { Account } from 'azle/canisters/icrc';
 
+// 메모리 내에 저장되는 데이터
 let userMap = StableBTreeMap(text, User, 0);
 let exhibitionMap = StableBTreeMap(text, Exhibition, 0);
 let artworkMap = StableBTreeMap(text, Artwork, 0);
 let ticketMap = StableBTreeMap(text, Ticket, 0);
 let commentMap = StableBTreeMap(text, Comment, 0);
 
-let exhibitionCost = 0n;
+let exhibitionCost = 10n; // 전시장 생성 비용
 
 const findUser = (id: text) => {
     const userOpt = userMap.get(id);
@@ -73,41 +73,12 @@ const findComment = (id: text) => {
     return commentOpt.Some;
 }
 
-import NftCanister from "../nft";
-import { Subaccount } from 'azle/canisters/icrc';
-
-const nftCanister = NftCanister(
-    Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai')
-);
-
-
-const mintNFT= async (owner: Principal, artist: text, price: nat) => {
-    const nftId = await ic.call(nftCanister.mintNFT, {
-        args: [owner, artist, price],
-    });
-    return nftId;
-}
-
-const getNftCollection = async (owner: Principal) => {
-    const nftList = await ic.call(nftCanister.getMyNFTList, {
-        args: [owner],
-    });
-    return nftList;
-}
-
-const createMetaData = async (name: text, description: text, image: blob) => {
-    const metaData = await ic.call(nftCanister.createMetaData, {
-        args: [name, description, image],
-    });
-    return metaData;
-}
-
 export default Canister({
     // 유저 정보 조회 (유저 id) -> Opt<User> 타입 리턴
     getUser: query([text], Opt(User), (id) => {
         return userMap.get(id);
     }),
-    // 유저 전시장 정보 조회 (유저 id) -> Vec<Exhibition> 타입 리턴
+    // 유저 소유 전시장 정보 조회 (유저 id) -> Vec<Exhibition> 타입 리턴
     getUserExhibitions: query([text], Vec(Exhibition), (id) => {
         // 1. 유저 존재하는지 확인
         const user = findUser(id);
@@ -236,7 +207,7 @@ export default Canister({
         return artworks;
     }),
     // 전시장 생성 (이름, 설명, 작품들, 티켓 가격, 티켓 이미지) -> text 타입 리턴
-    createExhibition: update([CreateExhibitionArgs], text, (args) => {
+    createExhibition: update([CreateExhibitionArgs], text, async (args) => {
         const caller = getCaller();
 
         // 1. 유저가 존재하는지 확인
@@ -252,14 +223,20 @@ export default Canister({
         }
 
         // 4. 전시장 생성 비용 지불
-        // TODO: call ledger canister
         // caller가 cost 만큼의 ICX를 canister에게 전송
-        const ownerAccount : typeof Account = {
-                owner: Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai"),
-            };
-        const createExhibition = transfer({    
+        const ownerAccount: typeof Account = {
+            owner: Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai"),
+            subaccount: None,
+        };
+
+        const createExhibition = await transfer({
+            from_subaccount: None,
             to: ownerAccount,
-            value: cost,
+            amount: cost,
+            fee: None,
+            memo: None,
+            created_at_time: None,
+
         });
 
         // 5. 전시장 id 및 티켓 id 생성
@@ -368,7 +345,7 @@ export default Canister({
         return false;
     }),
     // 티켓 구매 (전시장 id) -> bool 타입 리턴
-    buyTicket: update([text], bool, (exhibitionId) => {
+    buyTicket: update([text], bool, async (exhibitionId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
 
@@ -394,16 +371,21 @@ export default Canister({
         // 7. 티켓 구매 (TODO: call ledger canister)
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
         const exhibitionOwnerAccount: typeof Account = {
-            owner: exhibition.owner,           
+            owner: exhibition.owner,
+            subaccount: None,
         }
-        const buyTicket = transfer({
+        const buyTicket = await transfer({
+            from_subaccount: None,
             to: exhibitionOwnerAccount,
-            value: ticket.price,
+            amount: ticket.price,
+            fee: None,
+            memo: None,
+            created_at_time: None,
         });
 
         // 7-2. 티켓 NFT mint
-        const metaData = createMetaData(exhibition.name, exhibition.description, ticket.image);
-        const nftId = mintNFT(Principal.fromText(caller), caller, ticket.price);
+        const nftId = mintNFT(Principal.fromText(caller), exhibition.name, exhibition.description,
+            exhibition.owner.toText(), ticket.image, ticket.price);
 
         // 8. 티켓 저장
         user.tickets.push(ticket.id);
@@ -414,7 +396,7 @@ export default Canister({
         return true;
     }),
     // 작품 구매 (전시장 id, 작품 id) -> bool 타입 리턴
-    buyArtwork: update([text, text], bool, (exhibitionId, artworkId) => {
+    buyArtwork: update([text, text], bool, async (exhibitionId, artworkId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
 
@@ -441,15 +423,24 @@ export default Canister({
         const price = artwork.price;
 
         // 8. 작품 구매 (TODO: call ledger canister)
+        const exhibitionOwnerAccount: typeof Account = {
+            owner: exhibition.owner,
+            subaccount: None,
+        }
+
         // 8-1. 작품 가격만큼의 ICX를 artwork.owner에게 전송
-        const buyArtwork = transfer({
-            to: Principal.fromText(exhibition.owner),
-            value: price,
+        const buyArtwork = await transfer({
+            from_subaccount: None,
+            to: exhibitionOwnerAccount,
+            amount: price,
+            fee: None,
+            memo: None,
+            created_at_time: None,
         });
 
         // 8-2. 작품 NFT mint       
-        const metaData = createMetaData(artwork.name, artwork.description, artwork.image);
-        const nftId = mintNFT(Principal.fromText(caller), caller, price);
+        const nftId = await mintNFT(Principal.fromText(caller), artwork.name, artwork.description,
+            exhibition.owner.toText(), artwork.image, price);
 
         artwork.onSale = false;
 
@@ -508,7 +499,7 @@ export default Canister({
 
         const comment: typeof Comment = {
             id: commentId,
-            owner: caller,
+            owner: Principal.fromText(caller),
             exhibition: exhibition.id,
             content: content,
             adopted: false,
@@ -526,7 +517,7 @@ export default Canister({
         return true;
     }),
     // 15. 감상평 채택 (전시장 id, 작품 id, 감상평 id) -> bool 타입 리턴
-    adoptComment: update([text, text, text], bool, (exhibitionId, artworkId, commentId) => {
+    adoptComment: update([text, text, text, nat], bool, async (exhibitionId, artworkId, commentId, reward) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
 
@@ -553,14 +544,29 @@ export default Canister({
         }
 
         // 8. 감상평 작성자가 소유자인지 확인
-        if (comment.owner === caller) {
+        if (comment.owner === Principal.fromText(caller)) {
             throw new Error("Comment owner cannot be adopted");
         }
 
         // 9. 감상평 채택
         comment.adopted = true;
 
-        // 10. 감상평 저장
+        // 10. 채택 보상 지급
+        const commentOwnerAccount: typeof Account = {
+            owner: comment.owner,
+            subaccount: None,
+        }
+
+        const adoptionReward = await transfer({
+            from_subaccount: None,
+            to: commentOwnerAccount,
+            amount: reward,
+            fee: None,
+            memo: None,
+            created_at_time: None,
+        });
+
+        // 11. 감상평 저장
         commentMap.insert(commentId, comment);
 
         return true;

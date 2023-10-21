@@ -1,5 +1,5 @@
 service: () -> {
-    adoptComment: (text, text, text) -> (bool);
+    adoptComment: (text, text, text, nat) -> (bool);
     buyArtwork: (text, text) -> (bool);
     buyTicket: (text) -> (bool);
     closeExhibition: (text) -> (bool);
@@ -7,14 +7,14 @@ service: () -> {
     createUser: (text) -> (opt record {id:principal; exhibitions:vec text; tickets:vec text; name:text; comments:vec text; artWorks:vec text});
     getArtwork: (text) -> (opt record {id:text; owner:principal; name:text; description:text; image:vec nat8; comments:vec text; price:nat; onSale:bool; exhibition:text}) query;
     getArtworks: (text) -> (vec record {id:text; owner:principal; name:text; description:text; image:vec nat8; comments:vec text; price:nat; onSale:bool; exhibition:text}) query;
-    getComments: (text) -> (vec record {id:text; content:text; owner:text; adopted:bool; exhibition:text}) query;
+    getComments: (text) -> (vec record {id:text; content:text; owner:principal; adopted:bool; exhibition:text}) query;
     getExhibition: (text) -> (opt record {id:text; owner:principal; name:text; description:text; artworks:vec text; ticketId:text; onExhibition:bool}) query;
     getExhibitionCost: () -> (nat) query;
     getExhibitions: () -> (vec record {id:text; owner:principal; name:text; description:text; artworks:vec text; ticketId:text; onExhibition:bool}) query;
     getTicket: (text) -> (opt record {id:text; image:vec nat8; price:nat; exhibition:text}) query;
     getUser: (text) -> (opt record {id:principal; exhibitions:vec text; tickets:vec text; name:text; comments:vec text; artWorks:vec text}) query;
     getUserArtworks: (text) -> (vec record {id:text; owner:principal; name:text; description:text; image:vec nat8; comments:vec text; price:nat; onSale:bool; exhibition:text}) query;
-    getUserComments: (text) -> (vec record {id:text; content:text; owner:text; adopted:bool; exhibition:text}) query;
+    getUserComments: (text) -> (vec record {id:text; content:text; owner:principal; adopted:bool; exhibition:text}) query;
     getUserExhibitions: (text) -> (vec record {id:text; owner:principal; name:text; description:text; artworks:vec text; ticketId:text; onExhibition:bool}) query;
     getUserTickets: (text) -> (vec record {id:text; image:vec nat8; price:nat; exhibition:text}) query;
     hasTicket: (text) -> (bool) query;

@@ -18,16 +18,25 @@
 
 ## Introduction
 
-- In progress
+### Project Name
+
+- You can create your own exhibition and sell your art works
+- You can buy tickets to visit other artists' exhibitions
+- You can also buy art works from other artists
+- You can leave comments on art works and get rewards if your comments are adopted by artists
+
+>  Be a host of your own exhibition with your art works!
+
+- [Slides](https://docs.google.com/presentation/d/1u_sW8k0BL1nrQkMVXKf9CjOWpev7vhN2o9zdhgJZak8/edit?usp=sharing)
 
 ## How to run
 
 ### Requirements
 
-- Node.js
-- npm
-- dfx
-- Make
+- [Node.js](https://nodejs.org/ko/download)
+- [npm](https://docs.npmjs.com/getting-started)
+- [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/)
+- [Make](https://www.gnu.org/software/make/)
 
 ### Steps
 
@@ -83,3 +92,4 @@ make stop
 ## References
 
 - [The Azle Book](https://demergent-labs.github.io/azle/the_azle_book.html)
+- [Internet Computer Developer Docs](https://internetcomputer.org/docs/current/developer-docs/)
