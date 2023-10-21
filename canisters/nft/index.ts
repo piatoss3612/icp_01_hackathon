@@ -14,23 +14,9 @@ import {
     nat,
     Principal,
 } from 'azle';
-
-const MetaData = Record({
-    name: text,
-    description: text,
-    image: blob,
-});
+import { MetaData, Nft } from './types';
 
 const MetaDataList: Vec<typeof MetaData> = [];
-
-const Nft = Record({
-    id: nat,
-    owner: Principal,
-    metaData: MetaData,
-    artist: text,
-    price: nat,
-    onSale: bool
-});
 
 const NftList: Vec<typeof Nft> = [];
 
