@@ -1,48 +1,25 @@
 {
     "canisters": {
-        "internet_identity": {
-            "type": "custom",
-            "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-            "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
-            "remote": {
-                "id": {
-                    "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-                }
-            },
-            "frontend": {}
-        },
         "ledger": {
             "type": "custom",
-            "candid": "canisters/ledger/ledger.did",
-            "wasm": "canisters/ledger/ledger.wasm"
+            "candid": "src/ledger/ledger.did",
+            "wasm": "src/ledger/ledger.wasm"
         },
         "nft": {
             "type": "custom",
-            "main": "canisters/nft/index.ts",
-            "candid": "canisters/nft/nft.did",
+            "main": "src/nft/index.ts",
+            "candid": "src/nft/nft.did",
             "build": "npx azle nft",
             "wasm": ".azle/nft/nft.wasm",
             "gzip": true
         },
         "backend": {
             "type": "custom",
-            "main": "canisters/backend/index.ts",
-            "candid": "canisters/backend/backend.did",
+            "main": "src/backend/index.ts",
+            "candid": "src/backend/backend.did",
             "build": "npx azle backend",
             "wasm": ".azle/backend/backend.wasm",
             "gzip": true
-        },
-        "frontend": {
-            "dependencies": [
-                "backend"
-            ],
-            "frontend": {
-                "entrypoint": "dist/index.html"
-            },
-            "source": [
-                "dist/"
-            ],
-            "type": "assets"
         }
     },
     "defaults": {
