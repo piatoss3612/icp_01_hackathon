@@ -4,6 +4,8 @@ start:
 start_clean:
 	dfx start --clean --background
 
+deploy: ledger nft backend
+
 ii:
 	./scripts/internet_identity.sh
 

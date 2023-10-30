@@ -1,4 +1,4 @@
-# ICP 01 Hackathon
+# ICP 01 Hackathon - ICP Canvas
 
 ## Table of Contents
 
@@ -79,6 +79,12 @@ make nft
 make backend
 ```
 
+or
+
+```bash
+make deploy
+```
+
 5. Test
 
 ```bash
@@ -94,6 +100,11 @@ make buy_artwork exhibition=<exhibition_id> artwork=<artwork_id>
 ```bash
 make stop
 ```
+
+## Dependencies
+
+- azle: 0.18.5
+
 
 ## References
 
