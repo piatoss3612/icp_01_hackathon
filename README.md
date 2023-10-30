@@ -1,4 +1,4 @@
-# ICP 01 Hackathon - ICP Canvas
+# ICP 01 Hackathon
 
 ## Table of Contents
 
@@ -7,6 +7,7 @@
 - [How to run](#how-to-run)
   - [Requirements](#requirements)
   - [Steps](#steps)
+- [Dependencies](#dependencies)
 - [References](#references)
 
 ## Team Members
@@ -18,7 +19,7 @@
 
 ## Introduction
 
-### Project Name
+### ICP Canvas
 
 - You can create your own exhibition and sell your art works
 - You can buy tickets to visit other artists' exhibitions

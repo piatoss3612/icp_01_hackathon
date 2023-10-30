@@ -6,6 +6,9 @@ start_clean:
 
 deploy: ledger nft backend
 
+generate:
+	dfx generate
+
 ii:
 	./scripts/internet_identity.sh
 
