@@ -15,9 +15,7 @@ nft:
 
 .PHONY: backend
 backend:
-	dfx identity use default
-	dfx deploy backend
-	dfx generate backend
+	./scripts/backend.sh
 
 .PHONY: frontend
 frontend:
@@ -36,4 +34,4 @@ create_exhibition:
 
 .PHONY: buy_artwork
 buy_artwork:
-	./scripts/buy_artwork.sh
+	./scripts/buy_artwork.sh $(exhibition) $(artwork)

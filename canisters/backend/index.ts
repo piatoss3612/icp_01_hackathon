@@ -340,13 +340,7 @@ export default Canister({
         const exhibition = findExhibition(exhibitionId);
 
         // 4. 티켓 소지 여부 확인
-        for (let i = 0; i < user.tickets.length; i++) {
-            if (user.tickets[i] === exhibition.ticketId) {
-                return true;
-            }
-        }
-
-        return false;
+        return user.tickets.includes(exhibition.ticketId);
     }),
     // 티켓 구매 (전시장 id) -> bool 타입 리턴
     buyTicket: update([text], bool, async (exhibitionId) => {
@@ -420,44 +414,57 @@ export default Canister({
             return false;
         }
 
-        // 5. 작품 존재하는지 확인
+        // 5. 유저가 티켓을 소지하고 있는지 확인
+        if (!user.tickets.includes(exhibition.ticketId)) {
+            return false;
+        }
+
+        // 6. 작품 존재하는지 확인
         const artwork = findArtwork(artworkId);
 
-        // 6. 작품이 판매중인지 확인
+        // 7. 작품이 판매중인지 확인
         if (!artwork.onSale) {
             return false;
         }
 
-        // 7. 작품 가격 확인
+        // 8. 작품 가격 확인
         const price = artwork.price;
 
-        // 8. 작품 구매
-        const exhibitionOwnerAccount: typeof Account = {
+        // 9. 작품 구매
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
+            subaccount: None,
+        };
+        const toAccount: typeof Account = {
             owner: exhibition.owner,
             subaccount: None,
         }
 
-        // 8-1. 작품 가격만큼의 ICX를 artwork.owner에게 전송
-        const buyArtwork = await transfer({
-            from_subaccount: None,
-            to: exhibitionOwnerAccount,
+        // 10. 작품 가격만큼의 ICX를 artwork.owner에게 전송
+        const buyArtwork = await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: price,
             fee: None,
             memo: None,
             created_at_time: None,
         });
 
-        // 8-2. 작품 NFT mint       
+        if (!buyArtwork.Ok) {
+            throw new Error("Failed to buy artwork");
+        }
+
+        // 11. 작품 NFT mint       
         const nftId = await mintNFT(Principal.fromText(caller), artwork.name, artwork.description,
             exhibition.owner.toText(), artwork.image, price);
 
         artwork.onSale = false;
 
-        // 9. 작품 저장
+        // 12. 작품 저장
         artworkMap.insert(artworkId, artwork);
         user.artWorks.push(artwork.id);
 
-        // 10. 유저 저장
+        // 13. 유저 저장
         userMap.insert(caller, user);
 
         return true;
