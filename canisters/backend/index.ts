@@ -1,5 +1,4 @@
 import {
-    blob,
     bool,
     Canister,
     ic,
@@ -16,8 +15,8 @@ import {
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
-import { transfer, transfer_from } from './token'
-import { mintNFT, getMyNFTList } from './nft'
+import { transfer_from } from './token';
+import { mintNFT } from './nft';
 import { Account } from 'azle/canisters/icrc';
 
 // 메모리 내에 저장되는 데이터
@@ -533,7 +532,7 @@ export default Canister({
         return true;
     }),
     // 15. 감상평 채택 (전시장 id, 작품 id, 감상평 id) -> bool 타입 리턴
-    adoptComment: update([text, text, text, nat], bool, async (exhibitionId, artworkId, commentId, reward) => {
+    adoptComment: update([text, text, text, nat], bool, async (exhibitionId, artworkId, commentId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
 
@@ -569,7 +568,7 @@ export default Canister({
 
         // 10. 채택 보상 지급
         const fromAccount: typeof Account = {
-            owner: Principal.fromText(caller),
+            owner: ic.id(),
             subaccount: None,
         };
 
@@ -581,7 +580,7 @@ export default Canister({
         const adoptionReward = await transfer_from({
             from: fromAccount,
             to: toAccount,
-            amount: reward,
+            amount: 1n,
             fee: None,
             memo: None,
             created_at_time: None,
