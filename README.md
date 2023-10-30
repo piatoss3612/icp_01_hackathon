@@ -82,7 +82,11 @@ make backend
 5. Test
 
 ```bash
-# in progress
+# create exhibition and buy ticket
+make create_exhibition
+
+# buy artwork
+make buy_artwork exhibition=<exhibition_id> artwork=<artwork_id>
 ```
 
 6. Stop local network

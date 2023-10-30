@@ -1,7 +1,7 @@
 import {
-    blob,
     bool,
     Canister,
+    ic,
     nat,
     None,
     Opt,
@@ -15,11 +15,9 @@ import {
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
-import { transfer, transfer_from } from './token'
-import { mintNFT, getMyNFTList } from './nft'
+import { transfer_from } from './token';
+import { mintNFT } from './nft';
 import { Account } from 'azle/canisters/icrc';
-
-const BackendCanisterId = Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai");
 
 // 메모리 내에 저장되는 데이터
 let userMap = StableBTreeMap(text, User, 0);
@@ -28,7 +26,7 @@ let artworkMap = StableBTreeMap(text, Artwork, 0);
 let ticketMap = StableBTreeMap(text, Ticket, 0);
 let commentMap = StableBTreeMap(text, Comment, 0);
 
-let exhibitionCost = 10n; // 전시장 생성 비용
+const exhibitionCost = 10n; // 전시장 생성 비용
 
 const findUser = (id: text) => {
     const userOpt = userMap.get(id);
@@ -225,14 +223,19 @@ export default Canister({
 
         // 4. 전시장 생성 비용 지불
         // caller가 cost 만큼의 ICX를 canister에게 전송
-        const ownerAccount: typeof Account = {
-            owner: BackendCanisterId,
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
             subaccount: None,
         };
 
-        const createExhibition = await transfer({
-            from_subaccount: None,
-            to: ownerAccount,
+        const toAccount: typeof Account = {
+            owner: ic.id(),
+            subaccount: None,
+        };
+
+        await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: cost,
             fee: None,
             memo: None,
@@ -336,13 +339,7 @@ export default Canister({
         const exhibition = findExhibition(exhibitionId);
 
         // 4. 티켓 소지 여부 확인
-        for (let i = 0; i < user.tickets.length; i++) {
-            if (user.tickets[i] === exhibition.ticketId) {
-                return true;
-            }
-        }
-
-        return false;
+        return user.tickets.includes(exhibition.ticketId);
     }),
     // 티켓 구매 (전시장 id) -> bool 타입 리턴
     buyTicket: update([text], bool, async (exhibitionId) => {
@@ -370,13 +367,18 @@ export default Canister({
 
         // 7. 티켓 구매
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
-        const exhibitionOwnerAccount: typeof Account = {
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
+            subaccount: None,
+        };
+
+        const toAccount: typeof Account = {
             owner: exhibition.owner,
             subaccount: None,
         }
-        const buyTicket = await transfer({
-            from_subaccount: None,
-            to: exhibitionOwnerAccount,
+        await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: ticket.price,
             fee: None,
             memo: None,
@@ -384,7 +386,7 @@ export default Canister({
         });
 
         // 7-2. 티켓 NFT mint
-        const nftId = mintNFT(Principal.fromText(caller), exhibition.name, exhibition.description,
+        await mintNFT(Principal.fromText(caller), exhibition.name, exhibition.description,
             exhibition.owner.toText(), ticket.image, ticket.price);
 
         // 8. 티켓 저장
@@ -411,44 +413,57 @@ export default Canister({
             return false;
         }
 
-        // 5. 작품 존재하는지 확인
+        // 5. 유저가 티켓을 소지하고 있는지 확인
+        if (!user.tickets.includes(exhibition.ticketId)) {
+            return false;
+        }
+
+        // 6. 작품 존재하는지 확인
         const artwork = findArtwork(artworkId);
 
-        // 6. 작품이 판매중인지 확인
+        // 7. 작품이 판매중인지 확인
         if (!artwork.onSale) {
             return false;
         }
 
-        // 7. 작품 가격 확인
+        // 8. 작품 가격 확인
         const price = artwork.price;
 
-        // 8. 작품 구매
-        const exhibitionOwnerAccount: typeof Account = {
+        // 9. 작품 구매
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
+            subaccount: None,
+        };
+        const toAccount: typeof Account = {
             owner: exhibition.owner,
             subaccount: None,
         }
 
-        // 8-1. 작품 가격만큼의 ICX를 artwork.owner에게 전송
-        const buyArtwork = await transfer({
-            from_subaccount: None,
-            to: exhibitionOwnerAccount,
+        // 10. 작품 가격만큼의 ICX를 artwork.owner에게 전송
+        const buyArtwork = await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: price,
             fee: None,
             memo: None,
             created_at_time: None,
         });
 
-        // 8-2. 작품 NFT mint       
+        if (!buyArtwork.Ok) {
+            throw new Error("Failed to buy artwork");
+        }
+
+        // 11. 작품 NFT mint       
         const nftId = await mintNFT(Principal.fromText(caller), artwork.name, artwork.description,
             exhibition.owner.toText(), artwork.image, price);
 
         artwork.onSale = false;
 
-        // 9. 작품 저장
+        // 12. 작품 저장
         artworkMap.insert(artworkId, artwork);
         user.artWorks.push(artwork.id);
 
-        // 10. 유저 저장
+        // 13. 유저 저장
         userMap.insert(caller, user);
 
         return true;
@@ -517,7 +532,7 @@ export default Canister({
         return true;
     }),
     // 15. 감상평 채택 (전시장 id, 작품 id, 감상평 id) -> bool 타입 리턴
-    adoptComment: update([text, text, text, nat], bool, async (exhibitionId, artworkId, commentId, reward) => {
+    adoptComment: update([text, text, text, nat], bool, async (exhibitionId, artworkId, commentId) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
 
@@ -553,7 +568,7 @@ export default Canister({
 
         // 10. 채택 보상 지급
         const fromAccount: typeof Account = {
-            owner: Principal.fromText(caller),
+            owner: ic.id(),
             subaccount: None,
         };
 
@@ -565,7 +580,7 @@ export default Canister({
         const adoptionReward = await transfer_from({
             from: fromAccount,
             to: toAccount,
-            amount: reward,
+            amount: 1n,
             fee: None,
             memo: None,
             created_at_time: None,

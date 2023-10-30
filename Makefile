@@ -11,12 +11,11 @@ ledger:
 	./scripts/ledger.sh
 
 nft:
-	dfx deploy nft
+	./scripts/nft.sh
 
 .PHONY: backend
 backend:
-	dfx deploy backend
-	dfx generate backend
+	./scripts/backend.sh
 
 .PHONY: frontend
 frontend:
@@ -35,4 +34,4 @@ create_exhibition:
 
 .PHONY: buy_artwork
 buy_artwork:
-	./scripts/buy_artwork.sh
+	./scripts/buy_artwork.sh $(exhibition) $(artwork)

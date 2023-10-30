@@ -2,7 +2,7 @@ import { Principal, blob, ic, nat, text } from 'azle';
 import NftCanister from "../nft";
 
 const nftCanister = NftCanister(
-    Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai')
+    Principal.fromText('bd3sg-teaaa-aaaaa-qaaba-cai')
 );
 
 const mintNFT = async (owner: Principal, name: text, description: text, artist: text, image: blob, price: nat) => {

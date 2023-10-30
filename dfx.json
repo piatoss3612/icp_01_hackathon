@@ -25,10 +25,6 @@
             "gzip": true
         },
         "backend": {
-            "dependencies": [
-                "nft",
-                "ledger"
-            ],
             "type": "custom",
             "main": "canisters/backend/index.ts",
             "candid": "canisters/backend/backend.did",
