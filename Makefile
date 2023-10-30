@@ -11,10 +11,11 @@ ledger:
 	./scripts/ledger.sh
 
 nft:
-	dfx deploy nft
+	./scripts/nft.sh
 
 .PHONY: backend
 backend:
+	dfx identity use default
 	dfx deploy backend
 	dfx generate backend
 

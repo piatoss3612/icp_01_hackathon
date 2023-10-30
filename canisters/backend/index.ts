@@ -2,6 +2,7 @@ import {
     blob,
     bool,
     Canister,
+    ic,
     nat,
     None,
     Opt,
@@ -19,8 +20,6 @@ import { transfer, transfer_from } from './token'
 import { mintNFT, getMyNFTList } from './nft'
 import { Account } from 'azle/canisters/icrc';
 
-const BackendCanisterId = Principal.fromText("mxzaz-hqaaa-aaaar-qaada-cai");
-
 // 메모리 내에 저장되는 데이터
 let userMap = StableBTreeMap(text, User, 0);
 let exhibitionMap = StableBTreeMap(text, Exhibition, 0);
@@ -28,7 +27,7 @@ let artworkMap = StableBTreeMap(text, Artwork, 0);
 let ticketMap = StableBTreeMap(text, Ticket, 0);
 let commentMap = StableBTreeMap(text, Comment, 0);
 
-let exhibitionCost = 10n; // 전시장 생성 비용
+const exhibitionCost = 10n; // 전시장 생성 비용
 
 const findUser = (id: text) => {
     const userOpt = userMap.get(id);
@@ -225,14 +224,19 @@ export default Canister({
 
         // 4. 전시장 생성 비용 지불
         // caller가 cost 만큼의 ICX를 canister에게 전송
-        const ownerAccount: typeof Account = {
-            owner: BackendCanisterId,
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
             subaccount: None,
         };
 
-        const createExhibition = await transfer({
-            from_subaccount: None,
-            to: ownerAccount,
+        const toAccount: typeof Account = {
+            owner: ic.id(),
+            subaccount: None,
+        };
+
+        await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: cost,
             fee: None,
             memo: None,
@@ -370,13 +374,18 @@ export default Canister({
 
         // 7. 티켓 구매
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
-        const exhibitionOwnerAccount: typeof Account = {
+        const fromAccount: typeof Account = {
+            owner: Principal.fromText(caller),
+            subaccount: None,
+        };
+
+        const toAccount: typeof Account = {
             owner: exhibition.owner,
             subaccount: None,
         }
-        const buyTicket = await transfer({
-            from_subaccount: None,
-            to: exhibitionOwnerAccount,
+        await transfer_from({
+            from: fromAccount,
+            to: toAccount,
             amount: ticket.price,
             fee: None,
             memo: None,
@@ -384,7 +393,7 @@ export default Canister({
         });
 
         // 7-2. 티켓 NFT mint
-        const nftId = mintNFT(Principal.fromText(caller), exhibition.name, exhibition.description,
+        await mintNFT(Principal.fromText(caller), exhibition.name, exhibition.description,
             exhibition.owner.toText(), ticket.image, ticket.price);
 
         // 8. 티켓 저장

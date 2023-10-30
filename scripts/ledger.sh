@@ -1,7 +1,7 @@
 # Transfers from the minting account will create Mint transactions. 
 # Transfers to the minting account will create Burn transactions.
-dfx identity new minter
-dfx identity use minter
+dfx identity use default
+
 export MINTER=$(dfx identity get-principal)
 
 # Specify the token name and symbol of your choice
@@ -9,12 +9,11 @@ export TOKEN_NAME="My Token"
 export TOKEN_SYMBOL="XMTK"
 
 # Set the default identity or the identity with which you want to deploy the ledger.
-dfx identity use default
 export DEFAULT=$(dfx identity get-principal)
 
 # The number of pre-minted tokens is set to 10 billion. You may change this value to fit your ICRC-1 ledger's needs.
 export PRE_MINTED_TOKENS=10_000_000_000
-export TRANSFER_FEE=10_000
+export TRANSFER_FEE=0
 
 # The values set for archiving are the recommended values. You may change them to fit your ICRC-1 ledger's needs.
 export ARCHIVE_CONTROLLER=$(dfx identity get-principal)
