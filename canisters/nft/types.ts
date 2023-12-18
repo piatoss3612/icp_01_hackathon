@@ -15,4 +15,4 @@ const Nft = Record({
     onSale: bool
 });
 
-export {MetaData, Nft}
+export { MetaData, Nft }

@@ -21,6 +21,10 @@ backend:
 frontend:
 	dfx deploy frontend
 
+.PHONY: gen
+gen:
+	dfx generate
+
 stop:
 	dfx stop
 

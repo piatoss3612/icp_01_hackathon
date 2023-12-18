@@ -1,16 +1,5 @@
 export const idlFactory = ({ IDL }) => {
   return IDL.Service({
-    'createMetaData' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Vec(IDL.Nat8)],
-        [
-          IDL.Record({
-            'name' : IDL.Text,
-            'description' : IDL.Text,
-            'image' : IDL.Vec(IDL.Nat8),
-          }),
-        ],
-        [],
-      ),
     'getAllNFTList' : IDL.Func(
         [],
         [
@@ -32,19 +21,6 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getBalance' : IDL.Func([IDL.Principal], [IDL.Nat16], ['query']),
-    'getMetaDataList' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Opt(
-            IDL.Record({
-              'name' : IDL.Text,
-              'description' : IDL.Text,
-              'image' : IDL.Vec(IDL.Nat8),
-            })
-          ),
-        ],
-        ['query'],
-      ),
     'getMyNFTList' : IDL.Func(
         [IDL.Principal],
         [

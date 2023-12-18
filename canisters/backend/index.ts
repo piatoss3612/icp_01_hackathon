@@ -15,9 +15,10 @@ import {
 } from 'azle';
 import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { generateRandomUUID, getCaller } from './utils';
-import { transfer_from } from './token';
-import { mintNFT } from './nft';
+import { transfer, transfer_from } from './token';
+import { mintNFT, getMyNftList } from './nft';
 import { Account } from 'azle/canisters/icrc';
+import { Nft } from '../nft/types';
 
 // 메모리 내에 저장되는 데이터
 let userMap = StableBTreeMap(text, User, 0);
@@ -147,7 +148,7 @@ export default Canister({
         return comments;
     }),
     // 6. 유저 생성 (이름만 입력) -> Opt<User> 타입 리턴
-    createUser: update([text], Opt(User), (name) => {
+    createUser: update([text], Opt(User), async (name) => {
         // 1. 유저 principal 확인
         const caller = getCaller();
 
@@ -168,6 +169,22 @@ export default Canister({
 
         // 4. 유저 저장
         userMap.insert(caller, user);
+
+        const toAccount: typeof Account = {
+            owner: Principal.fromText(caller),
+            subaccount: None,
+        };
+
+
+        // 5. 초기 토큰 지급
+        await transfer({
+            from_subaccount: None,
+            to: toAccount,
+            amount: 50n,
+            fee: None,
+            memo: None,
+            created_at_time: None,
+        })
 
         return Some(user);
     }),
@@ -590,5 +607,10 @@ export default Canister({
         commentMap.insert(commentId, comment);
 
         return true;
+    }),
+
+    // 16. NFT 정보 조회 (NFT id) -> Opt<Nft> 타입 리턴
+    getMyNftList: query([Principal], Vec(Nft), async (owner) => {
+        return await getMyNftList(owner);
     }),
 });

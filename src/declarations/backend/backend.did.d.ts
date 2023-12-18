@@ -112,6 +112,23 @@ export interface _SERVICE {
       }
     >
   >,
+  'getMyNftList' : ActorMethod<
+    [Principal],
+    Array<
+      {
+        'id' : bigint,
+        'metaData' : {
+          'name' : string,
+          'description' : string,
+          'image' : Uint8Array | number[],
+        },
+        'owner' : Principal,
+        'artist' : string,
+        'price' : bigint,
+        'onSale' : boolean,
+      }
+    >
+  >,
   'getTicket' : ActorMethod<
     [string],
     [] | [

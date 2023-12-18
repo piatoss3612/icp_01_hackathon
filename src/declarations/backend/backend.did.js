@@ -133,6 +133,26 @@ export const idlFactory = ({ IDL }) => {
         ],
         ['query'],
       ),
+    'getMyNftList' : IDL.Func(
+        [IDL.Principal],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Nat,
+              'metaData' : IDL.Record({
+                'name' : IDL.Text,
+                'description' : IDL.Text,
+                'image' : IDL.Vec(IDL.Nat8),
+              }),
+              'owner' : IDL.Principal,
+              'artist' : IDL.Text,
+              'price' : IDL.Nat,
+              'onSale' : IDL.Bool,
+            })
+          ),
+        ],
+        ['query'],
+      ),
     'getTicket' : IDL.Func(
         [IDL.Text],
         [

@@ -12,21 +12,7 @@ const mintNFT = async (owner: Principal, name: text, description: text, artist: 
     return nftId;
 }
 
-const getNftCollection = async (owner: Principal) => {
-    const nftList = await ic.call(nftCanister.getMyNFTList, {
-        args: [owner],
-    });
-    return nftList;
-}
-
-const createMetaData = async (name: text, description: text, image: blob) => {
-    const metaData = await ic.call(nftCanister.createMetaData, {
-        args: [name, description, image],
-    });
-    return metaData;
-}
-
-const getMyNFTList = async (owner: Principal) => {
+const getMyNftList = async (owner: Principal) => {
     const myNFTList = await ic.call(nftCanister.getMyNFTList, {
         args: [owner],
     })
@@ -36,7 +22,5 @@ const getMyNFTList = async (owner: Principal) => {
 
 export {
     mintNFT,
-    getNftCollection,
-    createMetaData,
-    getMyNFTList
+    getMyNftList
 }

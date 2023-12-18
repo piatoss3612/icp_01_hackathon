@@ -1,17 +1,24 @@
 import { AuthClient } from '@dfinity/auth-client';
 import { createContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const INTERNET_IDENTITY_CANISTER_ID = process.env.CANISTER_ID_INTERNET_IDENTITY ||
     process.env.INTERNET_IDENTITY_CANISTER_ID;
 const LOCAL_II_URL = `http://127.0.0.1:4943/?canisterId=${INTERNET_IDENTITY_CANISTER_ID}`;
 
-export const AuthContext = createContext();
+export const AuthContext = createContext({
+    identity: null,
+    principal: null,
+    login: () => { },
+    logout: () => { },
+});
 
 const AuthProvider = ({ children }) => {
     const [iiUrl, setIiUrl] = useState("");
     const [identity, setIdentity] = useState(null);
     const [principal, setPrincipal] = useState(null);
     const [authClient, setAuthClient] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         let tempIiUrl = "";
@@ -32,13 +39,15 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    const Login = async () => {
+    const login = async () => {
         try {
             await authClient.login({
                 identityProvider: iiUrl,
                 onSuccess: () => {
                     const identity = authClient.getIdentity();
+                    const principal = identity.getPrincipal();
                     setIdentity(identity);
+                    setPrincipal(principal);
                     console.log("login success");
                 },
                 onError: () => {
@@ -58,6 +67,7 @@ const AuthProvider = ({ children }) => {
                 setPrincipal(null);
             }
             console.log("logout success");
+            navigate("/");
         } catch (err) {
             console.log(err);
         }
@@ -67,7 +77,7 @@ const AuthProvider = ({ children }) => {
         <AuthContext.Provider value={{
             identity,
             principal,
-            Login,
+            login,
             logout,
         }}>
             {children}
