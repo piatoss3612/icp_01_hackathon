@@ -38,17 +38,8 @@ const Exhibition = Record({
     name: text, // 전시장 이름
     description: text, // 전시장 설명
     artworks: Vec(text), // 전시장에 속한 작품들 (개수 제한 최대 5)
+    ticketHolders: Vec(Principal), // 전시장 티켓 소유자들
     onExhibition: bool, // 전시장이 전시중인지
-})
-
-// 유저
-const User = Record({
-    id: Principal, // 유저의 고유 식별자
-    name: text, // 유저의 이름
-    exhibitions: Vec(text), // 유저가 전시한 전시장들 (전시장 id)
-    artWorks: Vec(text), // 유저가 소유한 작품들 (작품 id)
-    tickets: Vec(text), // 유저가 소유한 티켓들 (티켓 id)
-    comments: Vec(text), // 유저가 작성한 감상평들 (감상평 id)
 })
 
 // 작품 생성 시 필요한 정보
@@ -74,7 +65,6 @@ export {
     Artwork,
     Ticket,
     Exhibition,
-    User,
     CreateArtworkArgs,
     CreateExhibitionArgs,
 }

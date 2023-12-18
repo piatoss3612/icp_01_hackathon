@@ -26,19 +26,7 @@ export interface _SERVICE {
     ],
     string
   >,
-  'createUser' : ActorMethod<
-    [string],
-    [] | [
-      {
-        'id' : Principal,
-        'exhibitions' : Array<string>,
-        'tickets' : Array<string>,
-        'name' : string,
-        'comments' : Array<string>,
-        'artWorks' : Array<string>,
-      }
-    ]
-  >,
+  'createUser' : ActorMethod<[], [] | [boolean]>,
   'getArtwork' : ActorMethod<
     [string],
     [] | [
@@ -93,6 +81,7 @@ export interface _SERVICE {
         'description' : string,
         'artworks' : Array<string>,
         'ticketId' : string,
+        'ticketHolders' : Array<Principal>,
         'onExhibition' : boolean,
       }
     ]
@@ -108,12 +97,13 @@ export interface _SERVICE {
         'description' : string,
         'artworks' : Array<string>,
         'ticketId' : string,
+        'ticketHolders' : Array<Principal>,
         'onExhibition' : boolean,
       }
     >
   >,
   'getMyNftList' : ActorMethod<
-    [Principal],
+    [],
     Array<
       {
         'id' : bigint,
@@ -140,72 +130,7 @@ export interface _SERVICE {
       }
     ]
   >,
-  'getUser' : ActorMethod<
-    [string],
-    [] | [
-      {
-        'id' : Principal,
-        'exhibitions' : Array<string>,
-        'tickets' : Array<string>,
-        'name' : string,
-        'comments' : Array<string>,
-        'artWorks' : Array<string>,
-      }
-    ]
-  >,
-  'getUserArtworks' : ActorMethod<
-    [string],
-    Array<
-      {
-        'id' : string,
-        'owner' : Principal,
-        'name' : string,
-        'description' : string,
-        'image' : Uint8Array | number[],
-        'comments' : Array<string>,
-        'price' : bigint,
-        'onSale' : boolean,
-        'exhibition' : string,
-      }
-    >
-  >,
-  'getUserComments' : ActorMethod<
-    [string],
-    Array<
-      {
-        'id' : string,
-        'content' : string,
-        'owner' : Principal,
-        'adopted' : boolean,
-        'exhibition' : string,
-      }
-    >
-  >,
-  'getUserExhibitions' : ActorMethod<
-    [string],
-    Array<
-      {
-        'id' : string,
-        'owner' : Principal,
-        'name' : string,
-        'description' : string,
-        'artworks' : Array<string>,
-        'ticketId' : string,
-        'onExhibition' : boolean,
-      }
-    >
-  >,
-  'getUserTickets' : ActorMethod<
-    [string],
-    Array<
-      {
-        'id' : string,
-        'image' : Uint8Array | number[],
-        'price' : bigint,
-        'exhibition' : string,
-      }
-    >
-  >,
+  'getUser' : ActorMethod<[Principal], [] | [boolean]>,
   'hasTicket' : ActorMethod<[string], boolean>,
   'writeComment' : ActorMethod<[string, string, string], boolean>,
 }

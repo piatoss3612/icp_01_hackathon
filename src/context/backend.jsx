@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { canisterId, createActor } from '../declarations/backend';
+import { canisterId, createActor, backend } from '../declarations/backend';
 import { AuthContext } from './auth';
 import { HttpAgent } from '@dfinity/agent';
 import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
@@ -7,7 +7,13 @@ import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generato
 export const BackendContext = createContext({
     isRegistered: false,
     getUser: async () => { },
-    createExhibition: async () => { },
+    createExhibition: async (exhibition) => { },
+    getExhibitions: async () => { },
+    getArtworks: async (exhibitionId) => { },
+    getTicket: async (ticketId) => { },
+    buyTicket: async (exhibitionId) => { },
+    buyArtwork: async (exhibitionId, artworkId) => { },
+    getMyNftList: async () => { },
 });
 
 export const BackendProvider = ({ children }) => {
@@ -36,16 +42,12 @@ export const BackendProvider = ({ children }) => {
         return backendActor;
     }
 
-    const getUser = async (userId) => {
+    const getUser = async () => {
         if (!backendActor) {
             throw new Error("Backend actor not loaded")
         }
 
-        if (!userId) {
-            throw new Error("User ID is required")
-        }
-
-        const resp = await backendActor.getUser(userId);
+        const resp = await backendActor.getUser(principal);
 
         if (!resp || !resp.length) {
             return null;
@@ -54,7 +56,7 @@ export const BackendProvider = ({ children }) => {
         return resp[0];
     }
 
-    const createUser = async (name) => {
+    const createUser = async () => {
         if (!backendActor) {
             throw new Error("Backend actor not loaded")
         }
@@ -63,11 +65,7 @@ export const BackendProvider = ({ children }) => {
             throw new Error("User already registered")
         }
 
-        if (!name) {
-            throw new Error("Name is required")
-        }
-
-        const resp = await backendActor.createUser(name);
+        const resp = await backendActor.createUser();
 
         if (!resp || !resp.length) {
             throw new Error("Unable to create user")
@@ -181,7 +179,7 @@ export const BackendProvider = ({ children }) => {
             throw new Error("Backend actor not loaded")
         }
 
-        const resp = await backendActor.getMyNftList(principal);
+        const resp = await backendActor.getMyNftList();
 
         if (!resp || !resp.length) {
             return [];
@@ -202,6 +200,13 @@ export const BackendProvider = ({ children }) => {
     }, [identity]);
 
     useEffect(() => {
+        if (principal) {
+            if (principal.isAnonymous()) {
+                console.log("user is anonymous");
+                return;
+            }
+        }
+
         if (principal && backendActor) {
             getUser(principal.toString()).then((user) => {
                 if (user) {
@@ -231,7 +236,17 @@ export const BackendProvider = ({ children }) => {
     }, [principal, backendActor]);
 
     return (
-        <BackendContext.Provider value={{ isRegistered, getUser }}>
+        <BackendContext.Provider value={{
+            isRegistered,
+            getUser,
+            createExhibition,
+            getExhibitions,
+            getArtworks,
+            getTicket,
+            buyTicket,
+            buyArtwork,
+            getMyNftList,
+        }}>
             {children}
         </BackendContext.Provider>
     );

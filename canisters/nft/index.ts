@@ -15,7 +15,7 @@ import { MetaData, Nft } from './types';
 
 const OwnerMap = StableBTreeMap(Principal, Vec(nat), 0);
 const NftMap = StableBTreeMap(nat, Nft, 1);
-const MetadataMap = StableBTreeMap(nat, MetaData, 1);
+const MetadataMap = StableBTreeMap(nat, MetaData, 2);
 
 export default Canister({
     // balance 조회(유저가 가진 nft 개수)

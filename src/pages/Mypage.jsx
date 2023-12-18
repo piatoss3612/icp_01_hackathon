@@ -8,10 +8,9 @@ import { BackendContext } from '../context/backend';
 
 const Mypage = () => {
     const { identity, principal } = useContext(AuthContext);
-    const { getUser } = useContext(BackendContext);
+    const { isRegistered } = useContext(BackendContext);
     const { getBalance } = useContext(LedgerContext);
 
-    const [user, setUser] = useState(null);
     const [balance, setBalance] = useState(0n);
 
     const navigate = useNavigate();
@@ -28,15 +27,6 @@ const Mypage = () => {
         }
 
         const loadMypage = async () => {
-            const userId = principal.toText();
-            const user = await getUser(userId);
-
-            if (!user) {
-                throw new Error("User not found");
-            }
-
-            setUser(user);
-
             const balance = await getBalance();
             setBalance(balance);
         }
@@ -53,7 +43,7 @@ const Mypage = () => {
         });
     }, [identity, principal]);
 
-    if (!user) {
+    if (!isRegistered) {
         return (
             <div style={{ marginTop: "100px", color: "white" }}>
                 <h1>Mypage</h1>
@@ -65,8 +55,7 @@ const Mypage = () => {
     return (
         <div style={{ marginTop: "100px", color: "white" }}>
             <h1>Mypage</h1>
-            <p>ID: {user.id.toText()}</p>
-            <p>Name: {user.name}</p>
+            <p>ID: {principal.toText()}</p>
             <p>Balance: {balance.toString()}</p>
         </div>
     );

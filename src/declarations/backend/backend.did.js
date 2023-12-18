@@ -29,22 +29,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text],
         [],
       ),
-    'createUser' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Opt(
-            IDL.Record({
-              'id' : IDL.Principal,
-              'exhibitions' : IDL.Vec(IDL.Text),
-              'tickets' : IDL.Vec(IDL.Text),
-              'name' : IDL.Text,
-              'comments' : IDL.Vec(IDL.Text),
-              'artWorks' : IDL.Vec(IDL.Text),
-            })
-          ),
-        ],
-        [],
-      ),
+    'createUser' : IDL.Func([], [IDL.Opt(IDL.Bool)], []),
     'getArtwork' : IDL.Func(
         [IDL.Text],
         [
@@ -109,6 +94,7 @@ export const idlFactory = ({ IDL }) => {
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
               'ticketId' : IDL.Text,
+              'ticketHolders' : IDL.Vec(IDL.Principal),
               'onExhibition' : IDL.Bool,
             })
           ),
@@ -127,6 +113,7 @@ export const idlFactory = ({ IDL }) => {
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
               'ticketId' : IDL.Text,
+              'ticketHolders' : IDL.Vec(IDL.Principal),
               'onExhibition' : IDL.Bool,
             })
           ),
@@ -134,7 +121,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getMyNftList' : IDL.Func(
-        [IDL.Principal],
+        [],
         [
           IDL.Vec(
             IDL.Record({
@@ -167,87 +154,7 @@ export const idlFactory = ({ IDL }) => {
         ],
         ['query'],
       ),
-    'getUser' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Opt(
-            IDL.Record({
-              'id' : IDL.Principal,
-              'exhibitions' : IDL.Vec(IDL.Text),
-              'tickets' : IDL.Vec(IDL.Text),
-              'name' : IDL.Text,
-              'comments' : IDL.Vec(IDL.Text),
-              'artWorks' : IDL.Vec(IDL.Text),
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'getUserArtworks' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Text,
-              'owner' : IDL.Principal,
-              'name' : IDL.Text,
-              'description' : IDL.Text,
-              'image' : IDL.Vec(IDL.Nat8),
-              'comments' : IDL.Vec(IDL.Text),
-              'price' : IDL.Nat,
-              'onSale' : IDL.Bool,
-              'exhibition' : IDL.Text,
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'getUserComments' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Text,
-              'content' : IDL.Text,
-              'owner' : IDL.Principal,
-              'adopted' : IDL.Bool,
-              'exhibition' : IDL.Text,
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'getUserExhibitions' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Text,
-              'owner' : IDL.Principal,
-              'name' : IDL.Text,
-              'description' : IDL.Text,
-              'artworks' : IDL.Vec(IDL.Text),
-              'ticketId' : IDL.Text,
-              'onExhibition' : IDL.Bool,
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'getUserTickets' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Text,
-              'image' : IDL.Vec(IDL.Nat8),
-              'price' : IDL.Nat,
-              'exhibition' : IDL.Text,
-            })
-          ),
-        ],
-        ['query'],
-      ),
+    'getUser' : IDL.Func([IDL.Principal], [IDL.Opt(IDL.Bool)], ['query']),
     'hasTicket' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
     'writeComment' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
   });
