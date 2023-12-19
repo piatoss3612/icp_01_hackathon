@@ -326,23 +326,38 @@ export default Canister({
         // 2. 유저가 존재하는지 확인
         const user = findUser(caller);
 
+        const exhibitionOpt: Opt<Exhibition> = exhibitionMap.get(exhibitionId);
+        if ("None" in exhibitionOpt) {
+            throw new Error("Exhibition not found");
+        }
+
+        console.log("exhibitionOpt: " + exhibitionOpt.Some.onExhibition)
+
+
         // 3. 전시장 존재하는지 확인
-        const exhibition = findExhibition(exhibitionId);
+        let currentExhibition = exhibitionOpt.Some;
+
+        console.log("retrieved exhibition")
 
         // 4. 전시장이 전시중인지 확인
-        if (!exhibition.onExhibition) {
+        if (!exhibitionOpt.Some.onExhibition) {
             return false;
         }
 
+        console.log("exhibition is on")
+
         // 5. 이미 티켓을 구매했는지 확인
-        for (let i = 0; i < exhibition.ticketHolders.length; i++) {
-            if (exhibition.ticketHolders[i].compareTo(caller) === 'eq') {
+        for (let i = 0; i < currentExhibition.ticketHolders.length; i++) {
+            if (currentExhibition.ticketHolders[i].compareTo(caller) === 'eq') {
+                console.log("already has ticket")
                 return false;
             }
         }
 
         // 6. 전시장 티켓 가격 확인
-        const ticket = exhibition.ticket;
+        const ticket = currentExhibition.ticket;
+
+        console.log("ticket price: " + ticket.price)
 
         // 7. 티켓 구매
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송
@@ -352,9 +367,12 @@ export default Canister({
         };
 
         const toAccount: typeof Account = {
-            owner: exhibition.owner,
+            owner: currentExhibition.owner,
             subaccount: None,
         }
+
+        console.log("transfering")
+
         const result = await transfer_from({
             from: fromAccount,
             to: toAccount,
@@ -363,15 +381,21 @@ export default Canister({
             memo: None,
             created_at_time: None,
         });
-        console.log(result);
+        console.log("transferred:" + result.Ok);
 
         // 7-2. 티켓 NFT mint
-        await mintNFT(caller, exhibition.name, exhibition.description,
-            exhibition.owner.toText(), ticket.image, ticket.price);
+        const result2 = await mintNFT(caller, currentExhibition.name, currentExhibition.description,
+            currentExhibition.owner.toText(), ticket.image, ticket.price);
+
+        console.log("minted:" + result2);
 
         // 8. 티켓 저장
-        exhibition.ticketHolders.push(caller);
-        exhibitionMap.insert(exhibitionId, exhibition);
+        currentExhibition.ticketHolders.push(caller);
+
+        // 여기서 로그를 찍으니까 함수가 실행이 잘 됨. 왜?
+        console.log("pushed ticket holder")
+
+        exhibitionMap.insert(exhibitionId, currentExhibition);
 
         return true;
     }),
