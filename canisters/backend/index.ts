@@ -310,8 +310,13 @@ export default Canister({
         // 3. 전시장 존재하는지 확인
         const exhibition = findExhibition(exhibitionId);
 
-        // 4. 티켓 소지 여부 확인
-        return exhibition.ticketHolders.includes(caller);
+        for (let i = 0; i < exhibition.ticketHolders.length; i++) {
+            if (exhibition.ticketHolders[i].compareTo(caller) === 'eq') {
+                return true;
+            }
+        }
+
+        return false;
     }),
     // 티켓 구매 (전시장 id) -> bool 타입 리턴
     buyTicket: update([text], bool, async (exhibitionId) => {
@@ -330,8 +335,10 @@ export default Canister({
         }
 
         // 5. 이미 티켓을 구매했는지 확인
-        if (exhibition.ticketHolders.includes(caller)) {
-            return false;
+        for (let i = 0; i < exhibition.ticketHolders.length; i++) {
+            if (exhibition.ticketHolders[i].compareTo(caller) === 'eq') {
+                return false;
+            }
         }
 
         // 6. 전시장 티켓 가격 확인
@@ -348,7 +355,7 @@ export default Canister({
             owner: exhibition.owner,
             subaccount: None,
         }
-        await transfer_from({
+        const result = await transfer_from({
             from: fromAccount,
             to: toAccount,
             amount: ticket.price,
@@ -356,6 +363,7 @@ export default Canister({
             memo: None,
             created_at_time: None,
         });
+        console.log(result);
 
         // 7-2. 티켓 NFT mint
         await mintNFT(caller, exhibition.name, exhibition.description,
@@ -384,7 +392,16 @@ export default Canister({
         }
 
         // 5. 유저가 티켓을 소지하고 있는지 확인
-        if (!exhibition.ticketHolders.includes(caller)) {
+        let hasTicket = false;
+
+        for (let i = 0; i < exhibition.ticketHolders.length; i++) {
+            if (exhibition.ticketHolders[i].compareTo(caller) === 'eq') {
+                hasTicket = true;
+                break;
+            }
+        }
+
+        if (!hasTicket) {
             return false;
         }
 

@@ -176,22 +176,13 @@ export const CalendarContainer = styled.div`
   align-items: center;
 `;
 
-export const PreNextStepContent = styled.div`
+export const Content = styled.div`
   animation: ${fadeIn} 0.2s ease-in;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 3rem;
   min-width: 680px;
-`;
-
-export const PostNextStepContent = styled.div`
-  animation: ${fadeIn} 0.2s ease-in;
-  text-align: center;
-
-  > button {
-    width: 100%;
-  }
 `;
 
 export const QrcodeContainer = styled.div`

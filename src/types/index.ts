@@ -31,4 +31,16 @@ interface Nft {
     onSale: boolean;
 }
 
-export type { Ticket, Exhibition, Nft };
+interface Artwork {
+    id: string;
+    owner: Principal;
+    name: string;
+    description: string;
+    image: Uint8Array | number[];
+    comments: Array<string>;
+    price: bigint;
+    onSale: boolean;
+    exhibition: string;
+}
+
+export type { Ticket, Exhibition, Nft, Artwork };
