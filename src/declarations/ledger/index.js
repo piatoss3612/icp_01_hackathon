@@ -11,7 +11,7 @@ export { idlFactory } from "./ledger.did.js";
  */
 export const canisterId =
   process.env.CANISTER_ID_LEDGER ||
-  process.env.LEDGER_CANISTER_ID;
+  process.env.NEXT_PUBLIC_LEDGER_CANISTER_ID;
 
 export const createActor = (canisterId, options = {}) => {
   const agent = options.agent || new HttpAgent({ ...options.agentOptions });

@@ -60,6 +60,10 @@ const CreateExhibitionArgs = Record({
     ticketImage: blob, // 전시장 티켓 이미지
 })
 
+const User = Record({
+    id: Principal, // 유저 id
+})
+
 export {
     Comment,
     Artwork,
@@ -67,4 +71,5 @@ export {
     Exhibition,
     CreateArtworkArgs,
     CreateExhibitionArgs,
+    User,
 }

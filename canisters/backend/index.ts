@@ -13,7 +13,7 @@ import {
     update,
     Vec,
 } from 'azle';
-import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket } from './types';
+import { Artwork, Comment, CreateExhibitionArgs, Exhibition, Ticket, User } from './types';
 import { transfer, transfer_from } from './token';
 import { mintNFT, getMyNftList } from './nft';
 import { Account } from 'azle/canisters/icrc';
@@ -23,10 +23,11 @@ type Exhibition = typeof Exhibition;
 type Artwork = typeof Artwork;
 type Ticket = typeof Ticket;
 type Comment = typeof Comment;
+type User = typeof User;
 
 // 메모리 내에 저장되는 데이터
 // 메모리 id가 달라야 함 -> 같으면 타입 에러 발생
-let userMap = StableBTreeMap(Principal, bool, 0);
+let userMap = StableBTreeMap(Principal, User, 0);
 
 let exhibitionMap = StableBTreeMap(text, Exhibition, 1);
 
@@ -38,7 +39,7 @@ let commentMap = StableBTreeMap(text, Comment, 4);
 
 const exhibitionCost = 10n; // 전시장 생성 비용
 
-const findUser = (id: Principal): bool => {
+const findUser = (id: Principal): User => {
     const userOpt = userMap.get(id);
     if ("None" in userOpt) {
         throw new Error("User not found");
@@ -102,28 +103,34 @@ const generateRandomUUID = (): string => {
 }
 
 export default Canister({
-    // 유저 존재 여부 확인 -> Opt<bool> 타입 리턴
-    getUser: query([Principal], Opt(bool), (key) => {
+    // 유저 존재 여부 확인 -> Opt<User> 타입 리턴
+    getUser: query([Principal], Opt(User), (key) => {
         return userMap.get(key);
     }),
     // 유저 생성 -> Opt<bool> 타입 리턴
-    createUser: update([], Opt(bool), async () => {
+    createUser: update([], Opt(User), async () => {
         // 1. 유저 principal 확인
         const caller = ic.caller();
 
-        // if (caller === null) {
-        //     throw new Error("Caller is null");
-        // }
+        if (caller === null) {
+            console.log("Caller is null");
+            throw new Error("Caller is null");
+        }
 
-        // if (caller.isAnonymous()) {
-        //     throw new Error("Caller is anonymous");
-        // }
+        if (caller.isAnonymous()) {
+            console.log("Caller is anonymous");
+            throw new Error("Caller is anonymous");
+        }
 
         // 2. 유저가 존재하는지 확인
         if (userMap.containsKey(caller)) {
             console.log("User already exists");
             return None;
         }
+
+        const user: typeof User = {
+            id: caller,
+        };
 
         // 3. 초기 토큰 지급
         const toAccount: typeof Account = {
@@ -141,9 +148,9 @@ export default Canister({
         })
 
         // 4. 유저 저장
-        userMap.insert(caller, true);
+        userMap.insert(caller, user);
 
-        return Some(true);
+        return Some(user);
     }),
     // 전시장 정보 조회 (전시장 id) -> Opt<Exhibition> 타입 리턴
     getExhibition: query([text], Opt(Exhibition), (id) => {

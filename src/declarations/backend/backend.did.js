@@ -29,7 +29,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text],
         [],
       ),
-    'createUser' : IDL.Func([], [IDL.Opt(IDL.Bool)], []),
+    'createUser' : IDL.Func(
+        [],
+        [IDL.Opt(IDL.Record({ 'id' : IDL.Principal }))],
+        [],
+      ),
     'getArtwork' : IDL.Func(
         [IDL.Text],
         [
@@ -154,7 +158,11 @@ export const idlFactory = ({ IDL }) => {
         ],
         ['query'],
       ),
-    'getUser' : IDL.Func([IDL.Principal], [IDL.Opt(IDL.Bool)], ['query']),
+    'getUser' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(IDL.Record({ 'id' : IDL.Principal }))],
+        ['query'],
+      ),
     'hasTicket' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
     'writeComment' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
   });

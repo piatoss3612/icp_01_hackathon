@@ -11,7 +11,7 @@ export { idlFactory } from "./internet_identity.did.js";
  */
 export const canisterId =
   process.env.CANISTER_ID_INTERNET_IDENTITY ||
-  process.env.INTERNET_IDENTITY_CANISTER_ID;
+  process.env.NEXT_PUBLIC_INTERNET_IDENTITY_CANISTER_ID;
 
 export const createActor = (canisterId, options = {}) => {
   const agent = options.agent || new HttpAgent({ ...options.agentOptions });

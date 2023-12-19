@@ -4,7 +4,7 @@ service: () -> {
     buyTicket: (text) -> (bool);
     closeExhibition: (text) -> (bool);
     createExhibition: (record {name:text; description:text; artworks:vec record {name:text; description:text; image:vec nat8; price:nat; onSale:bool}; ticketImage:vec nat8; ticketPrice:nat}) -> (text);
-    createUser: () -> (opt bool);
+    createUser: () -> (opt record {id:principal});
     getArtwork: (text) -> (opt record {id:text; owner:principal; name:text; description:text; image:vec nat8; comments:vec text; price:nat; onSale:bool; exhibition:text}) query;
     getArtworks: (text) -> (vec record {id:text; owner:principal; name:text; description:text; image:vec nat8; comments:vec text; price:nat; onSale:bool; exhibition:text}) query;
     getComments: (text) -> (vec record {id:text; content:text; owner:principal; adopted:bool; exhibition:text}) query;
@@ -13,7 +13,7 @@ service: () -> {
     getExhibitions: () -> (vec record {id:text; owner:principal; name:text; description:text; artworks:vec text; ticketId:text; ticketHolders:vec principal; onExhibition:bool}) query;
     getMyNftList: () -> (vec record {id:nat; metaData:record {name:text; description:text; image:vec nat8}; owner:principal; artist:text; price:nat; onSale:bool}) query;
     getTicket: (text) -> (opt record {id:text; image:vec nat8; price:nat; exhibition:text}) query;
-    getUser: (principal) -> (opt bool) query;
+    getUser: (principal) -> (opt record {id:principal}) query;
     hasTicket: (text) -> (bool) query;
     writeComment: (text, text, text) -> (bool);
 }

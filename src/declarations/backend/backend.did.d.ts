@@ -26,7 +26,7 @@ export interface _SERVICE {
     ],
     string
   >,
-  'createUser' : ActorMethod<[], [] | [boolean]>,
+  'createUser' : ActorMethod<[], [] | [{ 'id' : Principal }]>,
   'getArtwork' : ActorMethod<
     [string],
     [] | [
@@ -130,7 +130,7 @@ export interface _SERVICE {
       }
     ]
   >,
-  'getUser' : ActorMethod<[Principal], [] | [boolean]>,
+  'getUser' : ActorMethod<[Principal], [] | [{ 'id' : Principal }]>,
   'hasTicket' : ActorMethod<[string], boolean>,
   'writeComment' : ActorMethod<[string, string, string], boolean>,
 }

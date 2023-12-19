@@ -42,6 +42,3 @@ record {
      };
  }
 })"
-
-# Generate declarations for the ledger canister
-dfx generate ledger

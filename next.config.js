@@ -10,7 +10,15 @@ const EnvPlugin = new webpack.EnvironmentPlugin({
   DFX_NETWORK: "local"
 })
 
-module.exports = {
+const nextConfig = {
+  reactStrictMode: false,
+  output: "export",
+  compiler: {
+    styledComponents: true,
+  },
+  images: {
+    unoptimized: true,
+  },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Plugin
     config.plugins.push(EnvPlugin)
@@ -18,6 +26,6 @@ module.exports = {
     // Important: return the modified config
     return config
   },
-  output: "export",
-
 }
+
+module.exports = nextConfig
