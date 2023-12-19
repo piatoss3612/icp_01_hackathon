@@ -69,27 +69,14 @@ make start_clean
 4. Deploy canister to local network
 
 ```bash
-# 1. deploy ledger canister
-make ledger
+# deploy canisters
+make ii ledger nft backend
 
-# 2. deploy nft canister
-make nft
-
-# 3. deploy backend canister
-make backend
+# deploy frontend (if error occurs, just run this command again)
+make frontend
 ```
 
-5. Test
-
-```bash
-# create exhibition and buy ticket
-make create_exhibition
-
-# buy artwork
-make buy_artwork exhibition=<exhibition_id> artwork=<artwork_id>
-```
-
-6. Stop local network
+5. Stop local network
 
 ```bash
 make stop
