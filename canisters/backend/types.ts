@@ -33,7 +33,7 @@ const Ticket = Record({
 // 전시장
 const Exhibition = Record({
     id: text, // 전시장 id
-    ticketId: text, // 전시장 티켓 id
+    ticket: Ticket, // 전시장 티켓
     owner: Principal, // 전시장 소유자
     name: text, // 전시장 이름
     description: text, // 전시장 설명

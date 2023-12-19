@@ -62,15 +62,6 @@ const getExhibitions = (): Exhibition[] => {
     return exhibitions;
 }
 
-const findTicket = (id: text): Ticket => {
-    const ticketOpt = ticketMap.get(id);
-    if ("None" in ticketOpt) {
-        throw new Error("Ticket not found");
-    }
-
-    return ticketOpt.Some;
-}
-
 const findArtwork = (id: text): Artwork => {
     const artworkOpt = artworkMap.get(id);
     if ("None" in artworkOpt) {
@@ -248,24 +239,24 @@ export default Canister({
             artworkMap.insert(artworkId, artwork);
         }
 
-        // 7. 전시장 생성
+        // 7. 티켓 생성
+        const ticket: typeof Ticket = {
+            id: ticketId,
+            exhibition: exhibitionId,
+            price: args.ticketPrice,
+            image: args.ticketImage,
+        }
+
+        // 8. 전시장 생성
         const exhibition: typeof Exhibition = {
             id: exhibitionId,
-            ticketId: ticketId,
+            ticket: ticket,
             owner: caller,
             name: args.name,
             description: args.description,
             artworks: artworks,
             ticketHolders: [],
             onExhibition: true,
-        }
-
-        // 8. 티켓 생성
-        const ticket: typeof Ticket = {
-            id: ticketId,
-            exhibition: exhibition.id,
-            price: args.ticketPrice,
-            image: args.ticketImage,
         }
 
         // 9. 전시장 및 티켓 저장
@@ -344,7 +335,7 @@ export default Canister({
         }
 
         // 6. 전시장 티켓 가격 확인
-        const ticket = findTicket(exhibition.ticketId);
+        const ticket = exhibition.ticket;
 
         // 7. 티켓 구매
         // caller가 ticket.price 만큼의 ICX를 exhibition owner에게 전송

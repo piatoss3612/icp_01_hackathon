@@ -76,11 +76,16 @@ export interface _SERVICE {
     [] | [
       {
         'id' : string,
+        'ticket' : {
+          'id' : string,
+          'image' : Uint8Array | number[],
+          'price' : bigint,
+          'exhibition' : string,
+        },
         'owner' : Principal,
         'name' : string,
         'description' : string,
         'artworks' : Array<string>,
-        'ticketId' : string,
         'ticketHolders' : Array<Principal>,
         'onExhibition' : boolean,
       }
@@ -92,11 +97,16 @@ export interface _SERVICE {
     Array<
       {
         'id' : string,
+        'ticket' : {
+          'id' : string,
+          'image' : Uint8Array | number[],
+          'price' : bigint,
+          'exhibition' : string,
+        },
         'owner' : Principal,
         'name' : string,
         'description' : string,
         'artworks' : Array<string>,
-        'ticketId' : string,
         'ticketHolders' : Array<Principal>,
         'onExhibition' : boolean,
       }

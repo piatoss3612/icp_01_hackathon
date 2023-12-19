@@ -9,6 +9,7 @@ import * as S from '../styles/styled';
 import { CanisterContext } from '../context/canister';
 import { Principal } from '@dfinity/principal';
 import { canisterId as backendCanisterId } from '../declarations/backend';
+import { canisterId } from '../declarations/frontend';
 
 const EXTENSIONS = [
   { type: 'gif' },
@@ -143,7 +144,7 @@ const CreateExhibition = () => {
                 icon: "success",
                 confirmButtonText: "OK",
               }).then(() => {
-                router.push(`/explore`);
+                router.push(`/explore?canisterId=${canisterId}`);
               });
             }).catch((error) => {
               Swal.fire({

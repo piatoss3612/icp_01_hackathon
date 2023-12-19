@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link';
 import * as H from '../../styles/Header.styles';
 import { CanisterContext } from '../../context/canister';
+import { canisterId } from '../../declarations/frontend';
 
 
 const Header = () => {
@@ -24,10 +25,10 @@ const Header = () => {
       <div>
         <H.Menu>
           <li>
-            <Link href='/'>About us</Link>
+            <Link href={`/?canisterId=${canisterId}`}>About us</Link>
           </li>
           <li>
-            <Link href='/explore'>Explore</Link>
+            <Link href={`/explore?canisterId=${canisterId}`}>Explore</Link>
           </li>
           <li>
             {principal && !principal.isAnonymous() ? (<H.ProfileContainer>
@@ -41,10 +42,10 @@ const Header = () => {
                 {isDropdownOpen && (
                   <H.DropdownContainer className={isDropdownOpen ? 'open' : ''}>
                     <>
-                      <Link href={`/mypage`}>
+                      <Link href={`/mypage?canisterId=${canisterId}`}>
                         MyPage
                       </Link>
-                      <Link href={`/create`}>
+                      <Link href={`/create?canisterId=${canisterId}`}>
                         Create Exhibition
                       </Link>
                     </>

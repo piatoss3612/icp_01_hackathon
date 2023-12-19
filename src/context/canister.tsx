@@ -8,6 +8,7 @@ import { Principal } from '@dfinity/principal';
 import { useRouter } from 'next/router';
 import { _SERVICE as _BACKEND } from '../declarations/backend/backend.did';
 import { _SERVICE as _LEDGER } from '../declarations/ledger/ledger.did';
+import { canisterId } from '../declarations/frontend';
 
 const LOCAL_II_URL = `http://127.0.0.1:4943/?canisterId=${iiCanisterId}`;
 
@@ -124,7 +125,7 @@ const CanisterProvider = ({ children }: { children: React.ReactNode }) => {
                     setBackendActor(backendActor);
                     setLedgerActor(ledgerActor);
 
-                    router.push('/');
+                    router.push(`/?canisterId=${canisterId}`);
                 },
                 onError: () => {
                     console.log("login error");
@@ -144,7 +145,7 @@ const CanisterProvider = ({ children }: { children: React.ReactNode }) => {
             setPrincipal(null);
             console.log("logout success");
 
-            router.push('/');
+            router.push(`/?canisterId=${canisterId}`);
         } catch (err) {
             console.log(err);
         }

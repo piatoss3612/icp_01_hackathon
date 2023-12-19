@@ -11,6 +11,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <Component {...pageProps} />
+        <div id='root-modal'></div>
       </ThemeProvider>
     </CanisterProvider>
   )

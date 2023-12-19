@@ -93,11 +93,16 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(
             IDL.Record({
               'id' : IDL.Text,
+              'ticket' : IDL.Record({
+                'id' : IDL.Text,
+                'image' : IDL.Vec(IDL.Nat8),
+                'price' : IDL.Nat,
+                'exhibition' : IDL.Text,
+              }),
               'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
-              'ticketId' : IDL.Text,
               'ticketHolders' : IDL.Vec(IDL.Principal),
               'onExhibition' : IDL.Bool,
             })
@@ -112,11 +117,16 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Text,
+              'ticket' : IDL.Record({
+                'id' : IDL.Text,
+                'image' : IDL.Vec(IDL.Nat8),
+                'price' : IDL.Nat,
+                'exhibition' : IDL.Text,
+              }),
               'owner' : IDL.Principal,
               'name' : IDL.Text,
               'description' : IDL.Text,
               'artworks' : IDL.Vec(IDL.Text),
-              'ticketId' : IDL.Text,
               'ticketHolders' : IDL.Vec(IDL.Principal),
               'onExhibition' : IDL.Bool,
             })
