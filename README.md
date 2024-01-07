@@ -18,7 +18,7 @@
 
 ## Introduction
 
-### Project Name
+### ICP Canvas
 
 - You can create your own exhibition and sell your art works
 - You can buy tickets to visit other artists' exhibitions
@@ -51,7 +51,7 @@ git clone <this repository>
 2. Install dependencies
 
 ```bash
-npm install
+npm install --force
 ```
 
 3. Run local network
